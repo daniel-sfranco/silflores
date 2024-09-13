@@ -3,7 +3,6 @@
 /silfloresapp/project/local_settings.py
 gunicorn-error-log
 __localcode
-/data/
 
 # Django #
 *.log
@@ -105,7 +104,6 @@ celerybeat-schedule.*
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
