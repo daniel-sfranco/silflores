@@ -6,18 +6,24 @@
 
 body {
     min-height: 100vh;
-    background-color: black;
-    color: whitesmoke;
-    font-size: 3rem;
+    background-color: white;
+    color: black;
+    font-size: 2rem;
     display: flex;
     flex-flow: column;
 }
 
 nav {
-    padding: 1rem;
-    background-color: #44B78B;
-    color: white;
-    font-size: 2.5rem;
+    padding: 0.5rem;
+    background-color: #f3e1e9;
+    color: #008a52;
+    font-size: 2rem;
+}
+
+#sec_logo {
+    margin: 0;
+    padding: 0;
+    width: 10%;
 }
 
 main {
@@ -31,9 +37,13 @@ p {
     text-align: center;
 }
 
+h1 {
+    color: #bf5b87;
+}
+
 a {
     text-decoration: none;
-    color: #81dbb8;
+    color: #bf5b87;
 }
 
 a:hover {

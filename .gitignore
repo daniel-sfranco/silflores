@@ -3,6 +3,7 @@
 /silfloresapp/project/local_settings.py
 gunicorn-error-log
 __localcode
+notes/
 
 # Django #
 *.log
