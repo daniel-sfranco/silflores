@@ -22,6 +22,7 @@ class Product(models.Model):
         'choice': 'Selecionar tamanho',
         'set': 'Definir valor'
     }
+    # Tirar os valores que podem ser nulos daqui
     name = models.CharField(max_length=100)
     price = models.DecimalField(decimal_places=2, max_digits=6, null=True)
     tags = models.ManyToManyField(Tag)
@@ -30,6 +31,7 @@ class Product(models.Model):
     size = models.CharField(default='')
     term = models.IntegerField(null=True)
     photos = models.ManyToManyField(Photo)
+    slug = models.SlugField(null=True)
 
     def __str__(self) -> str:
         return str(self.name)
