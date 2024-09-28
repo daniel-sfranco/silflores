@@ -7,10 +7,10 @@
 {% block content%}
     <section>
         <h1>Products</h1>
-
         {% for product in products %}
             <article class="product">
-                <h4>{{ product.name }}</h4>
+                <h4><a href="{% url 'products:page' slug=product.slug %}">{{ product.name }}</a></h4>
+                <p>{{ product.desc }}</p>
                 <p>{{ product.price }}</p>
             </article>
         {% endfor %}

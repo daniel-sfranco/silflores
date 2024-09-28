@@ -8,14 +8,6 @@ class Tag(models.Model):
         return str(self.name)
 
 
-class Photo(models.Model):
-    photo = models.ImageField()
-    label = models.CharField(max_length=50, default='')
-
-    def __str__(self) -> str:
-        return str(self.label)
-
-
 class Product(models.Model):
     size_types = {
         'fixed': 'Tamanho fixo',
@@ -29,9 +21,17 @@ class Product(models.Model):
     desc = models.TextField(default='')
     size_type = models.CharField(choices=size_types, default='')
     size = models.CharField(default='')
-    term = models.IntegerField(null=True)
-    photos = models.ManyToManyField(Photo)
-    slug = models.SlugField(null=True)
+    term = models.IntegerField(blank=True)
+    slug = models.SlugField(blank=True)
 
     def __str__(self) -> str:
         return str(self.name)
+
+
+class Photo(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='photos', default=None)
+    photo = models.ImageField()
+    label = models.CharField(max_length=50, default='')
+
+    def __str__(self) -> str:
+        return str(self.label)
