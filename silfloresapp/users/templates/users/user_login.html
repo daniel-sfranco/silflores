@@ -6,4 +6,9 @@ Login
 
 {% block content %}
 <h1>Login with user</h1>
+<form class="login_form" action="/user/login/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button>Submit</button>
+</form>
 {% endblock %}
