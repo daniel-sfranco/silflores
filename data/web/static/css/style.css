@@ -50,13 +50,18 @@ a:hover {
     max-width: 600px;
 }
 
-.form div {
+.form p {
     display: flex;
     flex-flow: column;
     gap: 0.5rem;
 }
 
 .form input {
+    padding: 0.25rem;
+    max-width: 300px;
+}
+
+.form select {
     padding: 0.25rem;
     max-width: 300px;
 }

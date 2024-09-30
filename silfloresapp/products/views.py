@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
-from .models import Product, Photo
+from .models import Product, Photo, Tag
 from django.contrib.auth.decorators import login_required, user_passes_test
 from . import forms
-from .product_handler import check_slug
+from .product_handler import check_slug, tag_list
 
 def products_list(request):
     products = Product.objects.all().order_by('name')
@@ -29,14 +29,17 @@ def product_new(request, product_id=None):
         if product_form.is_valid():
             product = product_form.save(commit=False)
             product.slug = check_slug(product.name)
+            tags = tag_list(product_form.cleaned_data['tags'])
+            product.save()
+            product.tags.set(tags)
+            product_uploaded = True
             if photo_form.is_valid():
-                product_uploaded = True
-                product.save()
+                photo_counter = 1
                 for image in request.FILES.getlist('images'):
-                    photo = Photo(product=product, photo=image)
+                    photo = Photo(product=product, photo=image, label=product.slug + '-' + str(photo_counter))
+                    photo_counter += 1
                     photo.save()
-                    if photo in Photo.objects.all():
-                        photo_uploaded = True
+                    photo_uploaded = True
         if product_uploaded and photo_uploaded:
             return redirect('products:list')
         else:

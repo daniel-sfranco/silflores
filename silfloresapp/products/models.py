@@ -10,18 +10,17 @@ class Tag(models.Model):
 
 class Product(models.Model):
     size_types = {
-        'fixed': 'Tamanho fixo',
+        'fixed': 'Tamanho único',
         'choice': 'Selecionar tamanho',
         'set': 'Definir valor'
     }
-    # Tirar os valores que podem ser nulos daqui
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(decimal_places=2, max_digits=6, null=True)
+    name = models.CharField(max_length=150, verbose_name="Nome do Produto")
+    price = models.DecimalField(decimal_places=2, max_digits=6, null=True, verbose_name="Preço")
+    desc = models.TextField(default='', verbose_name="Descrição")
+    size_type = models.CharField(choices=size_types, default='', verbose_name='Tipo de tamanho')
+    size = models.CharField(default='', verbose_name='Tamanho (cm)')
+    term = models.IntegerField(blank=True, verbose_name='Prazo de produção')
     tags = models.ManyToManyField(Tag)
-    desc = models.TextField(default='')
-    size_type = models.CharField(choices=size_types, default='')
-    size = models.CharField(default='')
-    term = models.IntegerField(blank=True) # prazo de produção
     slug = models.SlugField(blank=True)
 
     def __str__(self) -> str:
@@ -31,6 +30,7 @@ class Product(models.Model):
 class Photo(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='photos', default=None)
     photo = models.FileField(upload_to="products/")
+    label = models.CharField(max_length=155, blank=True)
 
-    def __str__(self) -> str:
-        return str(self.label)
+    def __str__(self):
+        return self.label

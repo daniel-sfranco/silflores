@@ -18,9 +18,15 @@ class MultipleFileField(forms.FileField):
         return result
 
 class PhotoForm(forms.Form):
-    images = MultipleFileField()
+    images = MultipleFileField(label="Fotos")
 
 class ProductForm(forms.ModelForm):
+    tags = forms.CharField(required=False, widget=forms.Textarea)
     class Meta:
         model = models.Product
-        fields = ['name', 'price', 'desc', 'size_type', 'size', 'term']
+        fields = ['name', 'price', 'desc', 'size_type', 'size', 'term', 'tags']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].widget = forms.Textarea()
+        self.fields['tags'].help_text = "Insira as tags separadas por vírgula ou espaço"
