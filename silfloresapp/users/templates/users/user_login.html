@@ -6,12 +6,12 @@ Login
 
 {% block content %}
 <h1>Login with user</h1>
-<form class="login_form" action="/user/login/" method="post">
+<form class="form" action="/user/login/" method="post">
     {% csrf_token %}
     {{ form }}
     {% if request.GET.next %}
     <input type="hidden" name="next" value="{{request.GET.next}}"/>
     {% endif %}
-    <button>Submit</button>
+    <button class="form-submit">Submit</button>
 </form>
 {% endblock %}
