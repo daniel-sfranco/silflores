@@ -7,16 +7,17 @@
 {% block content%}
     <section>
         <h1>{{product.page}}</h1>
-            <h2>{{ product.name }}</h2>
             {% for image in product.photos.all %}
                 <img src="{{image.photo.url}}" alt="{{image.label}}"/>
             {% endfor %}
-            <p>{{ product.desc }}</p>
+            <h2>{{ product.name }}</h2>
+            <p>Descrição: <br>{{ product.desc }}</p>
+            <p>Preço: {{ product.price }}</p>
+            <p>Tags:</p>
             <ul>
             {% for tag in product.tags.all %}
                 <li>{{tag.name}}</li>
             {% endfor %}
             </ul>
-            <p>{{ product.price }}</p>
     </section>
 {% endblock%}
