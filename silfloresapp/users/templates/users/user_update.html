@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+User Update
+{% endblock %}
+
+{% block content %}
+<h1>User Update</h1>
+<form class="form" action="/user/update/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <button class="form-submit">Submit</button>
+</form>
+{% endblock content %}

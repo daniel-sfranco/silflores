@@ -12,11 +12,24 @@ body {
 }
 
 nav {
+    width: 100%;
     padding: 0.5rem;
     background-color: #f3e1e9;
-    color: #008a52;
     font-size: 1rem;
     display: flex;
+}
+
+#right-header {
+    margin-top: 0rem;
+    display: flex;
+    float: right;
+}
+
+#left-header {
+    width: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
 }
 
 nav a {
@@ -25,7 +38,7 @@ nav a {
 
 main {
     padding: 2rem;
-    margin: 0 auto;
+    margin: 0;
 }
 
 h1{
@@ -41,6 +54,7 @@ a:hover {
     opacity: .85;
 }
 
+
 .form {
     font-size: 1rem;
     padding: 1rem;
@@ -50,7 +64,7 @@ a:hover {
     max-width: 600px;
 }
 
-.form p {
+.form > div, .form > p {
     display: flex;
     flex-flow: column;
     gap: 0.5rem;
@@ -70,6 +84,9 @@ a:hover {
     padding: 0.5rem;
     border-radius: 10px;
     width: 125px;
+    border: none;
+    background-color: #f3e1e9;
+    color:#bf5b87;
 }
 
 #logout {
