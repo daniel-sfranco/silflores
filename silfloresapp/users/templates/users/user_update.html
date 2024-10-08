@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 
+{% load static %}
+
 {% block title %}
 User Update
 {% endblock %}
 
 {% block content %}
 <h1>User Update</h1>
-<form class="form" action="/user/update/" method="post">
+<form class="form" action="/user/update/" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form }}
     <button class="form-submit">Submit</button>
 </form>
+<script src="{% static 'js/photo_visualization.js' %}"></script>
 {% endblock content %}

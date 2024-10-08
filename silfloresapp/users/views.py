@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth import login, logout
+from django.conf import settings
 
 # Create your views here.
 
@@ -40,10 +41,23 @@ def user_logout(request):
 def user_update(request):
     instance = CustomUser.objects.get(username=request.user.username)
     if request.method == "POST":
-        form = CustomUserChangeForm(data=request.POST, instance=instance)
+        form = CustomUserChangeForm(data=request.POST, files = request.FILES, instance=instance)
         if form.is_valid():
             form.save()
+            if 'photo-clear' in request.POST:
+                request.user.photo = CustomUser._meta.get_field('photo').get_default()
+                request.user.save()
             return redirect('home')
     else:
         form = CustomUserChangeForm(instance=instance)
     return render(request, 'users/user_update.html', {"form": form})
+
+def user_profile(request):
+    return render(request, 'users/user_profile.html', {'profile': request.user})
+
+def user_delete(request):
+    user = CustomUser.objects.get(username = request.user.username)
+    if user.is_authenticated:
+        logout(request)
+    user.delete()
+    return redirect('home')

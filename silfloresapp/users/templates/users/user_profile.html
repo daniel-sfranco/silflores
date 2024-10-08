@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% load static %}
+
+{% block title %}
+Seu perfil
+{% endblock %}
+
+{% block content %}
+    <h1>Seu perfil</h1>
+    <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+    <p>Nome de Usuário: {{profile.username}}</p>
+    <p>Email: {{profile.email}}</p>
+    <a href="{% url "users:update" %}">Update profile</a>
+    <button id="btnDelete" class="form-submit">Excluir Conta</button>
+
+    <div id="modalDelete" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Tem certeza que deseja excluir sua conta?</p>
+            <div class="modal-footer">
+                <button id="btnCancel" class="form-submit">Cancelar</button>
+                <button id="btnConfirm" data-delete-url="{% url 'users:delete' %}" class="form-submit">Excluir</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="{% static 'js/delete_user.js' %}"></script>
+{% endblock %}
