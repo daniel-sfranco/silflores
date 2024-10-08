@@ -20,6 +20,7 @@ class Product(models.Model):
     size_type = models.CharField(choices=size_types, default='', verbose_name='Tipo de tamanho')
     size = models.CharField(default='', verbose_name='Tamanho (cm)')
     term = models.IntegerField(blank=True, verbose_name='Prazo de produção')
+    stock = models.IntegerField(default=0, verbose_name='Estoque (0 para encomenda)')
     tags = models.ManyToManyField(Tag)
     slug = models.SlugField(blank=True)
 

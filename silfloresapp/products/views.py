@@ -3,6 +3,7 @@ from .models import Product, Photo, Tag
 from django.contrib.auth.decorators import login_required, user_passes_test
 from . import forms
 from .product_handler import check_slug, tag_list
+from users.models import CustomUser
 
 def products_list(request):
     products = Product.objects.all().order_by('name')
@@ -10,9 +11,10 @@ def products_list(request):
 
 def product_page(request, slug):
     product = Product.objects.get(slug=slug)
-    return render(request, 'products/product_page.html', {'product': product})
+    user = CustomUser.objects.get(username=request.user.username)
+    return render(request, 'products/product_page.html', {'product': product, 'user': user})
 
-@login_required(login_url="/users/login/")
+@login_required(login_url="/user/login/")
 @user_passes_test(lambda u: u.is_superuser)
 def product_new(request, product_id=None):
     if product_id:
@@ -48,3 +50,11 @@ def product_new(request, product_id=None):
         product_form = forms.ProductForm()
         photo_form = forms.PhotoForm()
     return render(request, 'products/product_new.html', {"product_form":product_form, "photo_form":photo_form, "product":product})
+
+@login_required(login_url="/user/login")
+@user_passes_test(lambda u:u.is_superuser)
+def product_delete(request, slug):
+    product = Product.objects.get(slug=slug)
+    product.delete()
+    return redirect('/products/')
+
