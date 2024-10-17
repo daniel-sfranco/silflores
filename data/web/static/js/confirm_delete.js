@@ -1,5 +1,5 @@
 const btnDelete = document.getElementById('btnDelete');
-const modalDelete = document.getElementById('modalDelete');
+const modalDelete = document.querySelector('.modalDelete');
 const btnCancel = document.getElementById('btnCancel');
 const btnConfirm = document.getElementById('btnConfirm');
 const span = document.getElementsByClassName("close")[0];
@@ -13,9 +13,7 @@ span.onclick = function() {
     modalDelete.style.display = "none";
 }
 
-btnCancel.onclick = function() {
-    modalDelete.style.display = "none";
-}
+c
 
 btnConfirm.onclick = function() {
     window.location.href = deleteUrl;

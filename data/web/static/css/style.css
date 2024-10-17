@@ -84,6 +84,20 @@ a:hover {
     max-width: 300px;
 }
 
+.form > .photo {
+    flex-flow: row;
+}
+
+.product_photo {
+    width: 25rem;
+    height: 25rem;
+    object-fit: contain;
+}
+
+.product_photo::hover {
+    opacity: .85;
+}
+
 .form-submit {
     padding: 0.5rem;
     border-radius: 10px;

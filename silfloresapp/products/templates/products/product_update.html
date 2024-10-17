@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block title %}
+Atualizar Produto
+{% endblock %}
+
+{% block content %}
+<h1>Atualizar produto</h1>
+<form class="form" action="{% url 'products:update' slug=product.slug %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="photo">
+        {% for image in product.photos.all %}
+            <img src="{{image.photo.url}}" alt="{{image.label}}" class="product_photo" data-delete-url="{% url 'products:delete_photo' image.id %}"/>
+        {% endfor %}
+    </div>
+    {{ photo_form }}
+
+    <div id="modalDeletePhoto" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Tem certeza que deseja excluir essa foto?</p>
+            <div class="modal-footer">
+                <button id="btnCancel" class="form-submit">Cancelar</button>
+                <button id="btnConfirm" class="form-submit">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    {{ product_form.as_p }}
+    <button class="form-submit">Atualizar</button>
+</form>
+<script src="{% static 'js/product_photo_visualization.js' %}"></script>
+{% endblock content %}

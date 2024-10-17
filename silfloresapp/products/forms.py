@@ -30,3 +30,19 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['tags'].widget = forms.Textarea()
         self.fields['tags'].help_text = "Insira as tags separadas por vírgula"
+
+class ProductChangeForm(forms.ModelForm):
+    tags = forms.CharField(required=False, widget=forms.Textarea)
+    class Meta:
+        model = models.Product
+        fields = ['name', 'price', 'desc', 'size_type', 'size', 'term', 'stock']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+
+        if instance:
+            tag_names = ', '.join(tag.name for tag in instance.tags.all())
+            self.fields['tags'].initial = tag_names
+        self.fields['tags'].widget = forms.Textarea()
+        self.fields['tags'].help_text = "Insira as tags separadas por vírgula"

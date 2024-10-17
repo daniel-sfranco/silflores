@@ -23,6 +23,7 @@ class Product(models.Model):
     stock = models.IntegerField(default=0, verbose_name='Estoque (0 para encomenda)')
     tags = models.ManyToManyField(Tag)
     slug = models.SlugField(blank=True)
+    numPhotos = models.IntegerField(default=0)
 
     def __str__(self) -> str:
         return str(self.name)
