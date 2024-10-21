@@ -6,7 +6,9 @@ class MultipleFileInput(forms.ClearableFileInput):
 
 class MultipleFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
+        required = kwargs.get('required', True)
         kwargs.setdefault("widget", MultipleFileInput())
+        kwargs.setdefault("required", required)
         super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
@@ -19,6 +21,10 @@ class MultipleFileField(forms.FileField):
 
 class PhotoForm(forms.Form):
     images = MultipleFileField(label="Fotos")
+    def __init__(self, *args, **kwargs):
+        required = kwargs.pop('required', True)
+        super(PhotoForm, self).__init__(*args, **kwargs)
+        self.fields['images'] = MultipleFileField(label="Fotos", required=required)
 
 class ProductForm(forms.ModelForm):
     tags = forms.CharField(required=False, widget=forms.Textarea)

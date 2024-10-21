@@ -34,13 +34,14 @@ def product_new(request, product_id=None):
             product = product_form.save(commit=False)
             product.slug = check_slug(product.name)
             tags = tag_list(product_form.cleaned_data['tags'])
-            if photo_form.is_valid():
-                product.numPhotos = 1
-                for image in request.FILES.getlist('images'):
-                    photo = Photo(product=product, photo=image, label=product.slug + '-' + str(product.numPhotos))
-                    product.numPhotos += 1
-                    photo.save()
+            product.numPhotos = len(request.FILES.getlist('images'))
             product.save()
+            if photo_form.is_valid():
+                i = 1
+                for image in request.FILES.getlist('images'):
+                    photo = Photo(product=product, photo=image, label=product.slug + '-' + str(i))
+                    i += 1
+                    photo.save()
             product.tags.set(tags)
             return redirect('products:list')
         else:
@@ -65,7 +66,7 @@ def product_update(request, slug):
     product = Product.objects.get(slug=slug)
     if request.POST:
         product_form = forms.ProductChangeForm(request.POST, instance=product)
-        photo_form = forms.PhotoForm(request.POST, request.FILES);
+        photo_form = forms.PhotoForm(request.POST, request.FILES, required=False);
         if product_form.is_valid():
             product = product_form.save(commit=False)
             if photo_form.is_valid():
@@ -83,7 +84,7 @@ def product_update(request, slug):
             return redirect(f'/products/{slug}')
     else:
         product_form = forms.ProductChangeForm(instance=product)
-        photo_form = forms.PhotoForm
+        photo_form = forms.PhotoForm(required=False)
     return render(request, 'products/product_update.html', {'product': product, 'product_form': product_form, 'photo_form': photo_form})
 
 
