@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Cart
+{% endblock %}
+
+{% block content %}
+    <h1>Cart Page</h1>
+    <p>{{user.name}}</p>
+    {% if items %}
+        <h2>Produtos</h2>
+        {% for item in items%}
+            <p>{{item.product.name}}</p>
+        {% endfor %}
+    {% endif %}
+    <p>Preço total: R${{cart.fullPrice}}</p>
+{% endblock content %}

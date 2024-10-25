@@ -13,7 +13,11 @@ span.onclick = function() {
     modalDelete.style.display = "none";
 }
 
-c
+
+btnCancel.onclick = function() {
+    modalDelete.style.display = "none";
+}
+
 
 btnConfirm.onclick = function() {
     window.location.href = deleteUrl;
