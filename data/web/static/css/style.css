@@ -58,6 +58,10 @@ a:hover {
     opacity: .85;
 }
 
+section {
+    padding: 1rem;
+}
+
 
 .form {
     font-size: 1rem;
@@ -165,4 +169,9 @@ a:hover {
     height: 2rem;
     margin-right: 1rem;
     margin-left: 1rem;
+}
+
+.cart-product-table {
+    width: 100%;
+    border: 1px solid black;
 }

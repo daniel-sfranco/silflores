@@ -24,7 +24,7 @@
     </section>
 
     {% if user.is_superuser %}
-    <a href="{% url 'products:update' product.slug %}">Atualizar Produto</a>
+    <a href="{% url 'products:update' product.slug %}" class="form-submit">Atualizar Produto</a>
     <button id="btnDelete" class="form-submit">Excluir Produto</button>
 
     <div class="modalDelete modal">
@@ -39,5 +39,10 @@
     </div>
     <script src="{% static 'js/confirm_delete.js' %}"></script>
     {% endif %}
+
+    <a class="form-submit" href="{% url 'cart:add' product.slug %}">Adicionar ao carrinho</a>
+
+    {% if product.size_type == 'choice' %}{% endif %}
+
 
 {% endblock%}

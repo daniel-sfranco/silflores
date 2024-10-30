@@ -4,6 +4,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth import login, logout
 from django.conf import settings
+from cart.models import Cart
 
 # Create your views here.
 
@@ -12,7 +13,10 @@ def user_register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if(form.is_valid()):
-            login(request, form.save())
+            user = form.save()
+            user.cart = Cart(user=user)
+            user.cart.save()
+            login(request, user)
             return redirect('home')
     else:
         form = CustomUserCreationForm()
@@ -57,7 +61,9 @@ def user_profile(request):
 
 def user_delete(request):
     user = CustomUser.objects.get(username = request.user.username)
+    cart = user.cart
     if user.is_authenticated:
         logout(request)
+    cart.delete()
     user.delete()
     return redirect('home')

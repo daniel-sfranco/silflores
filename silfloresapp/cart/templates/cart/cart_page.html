@@ -9,9 +9,30 @@
     <p>{{user.name}}</p>
     {% if items %}
         <h2>Produtos</h2>
-        {% for item in items%}
-            <p>{{item.product.name}}</p>
-        {% endfor %}
+        <table class="cart-product-table">
+            <thead>
+                <td>Produto</td>
+                <td>Quantidade</td>
+                <td>Preço</td>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{item.product.name}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.fullPrice}}</td>
+                    <td>{{item.datetime}}</td>
+                    <td><a href="{% url 'cart:add' item.product.slug %}">Adicionar 1</a></td>
+                    <td><a href="{% url 'cart:deleteItem' item.itemName%}">Deletar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Número de produtos: {{cart.products}}</td>
+                </tr>
+            </tfoot>
+        </table>
     {% endif %}
     <p>Preço total: R${{cart.fullPrice}}</p>
 {% endblock content %}
