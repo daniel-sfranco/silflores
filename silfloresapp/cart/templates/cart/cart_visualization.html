@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% load my_tags %}
+
+{% block title %}
+    Cart
+{% endblock %}
+
+{% block content %}
+    <h1>Orders</h1>
+    {% for cart in carts %}
+        <hr>
+        <p>Nome: {{cart.user.name}}</p>
+        <p>Usuário: {{cart.user.username}}</p>
+        <table class="cart-product-table">
+            <thead>
+                <td>Produto</td>
+                <td>Quantidade</td>
+                <td>Preço</td>
+                <td>Preço por unidade</td>
+                <td>Data de adição</td>
+                <td>Tamanho (cm)</td>
+            </thead>
+            <tbody>
+                {% for item in items|get:cart.id %}
+                    <tr>
+                        <td>{{item.product.name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td>{{item.fullPrice}}</td>
+                        <td>{{item.product.price}}</td>
+                        <td>{{item.datetime}}</td>
+                        <td>{{item.size}}</td>
+                        <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Número de produtos: {{cart.products}}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <p>Preço total: R${{cart.fullPrice}}</p>
+    {% endfor %}
+    <hr>
+{% endblock content %}

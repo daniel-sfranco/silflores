@@ -1,15 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import JsonResponse
+from django.urls import reverse
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth import login, logout
-from django.conf import settings
 from cart.models import Cart
 
 # Create your views here.
 
-
 def user_register(request):
+    next_url = request.GET.get('next') or request.POST.get('next')
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if(form.is_valid()):
@@ -17,20 +18,28 @@ def user_register(request):
             user.cart = Cart(user=user)
             user.cart.save()
             login(request, user)
+            if(next_url):
+                return HttpResponseRedirect(next_url)
             return redirect('home')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/user_register.html', {"form":form})
+    return render(request, 'users/user_register.html', {"form":form, "next":next_url})
 
 
 def user_login(request):
     if request.method == "POST":
+        next_url = request.GET.get('next') or request.POST.get('next')
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            if 'next' in request.POST:
-                return redirect(request.POST.get('next'))
+            if next_url:
+                return HttpResponseRedirect(next_url)
             return redirect('home')
+        else:
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url:
+                return HttpResponseRedirect(f"{request.path}?next={next_url}")
+            return HttpResponseRedirect(f"{request.path}")
     else:
         form = AuthenticationForm()
     return render(request, 'users/user_login.html', {"form":form})

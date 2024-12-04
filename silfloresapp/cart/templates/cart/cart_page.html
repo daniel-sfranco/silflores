@@ -14,6 +14,9 @@
                 <td>Produto</td>
                 <td>Quantidade</td>
                 <td>Preço</td>
+                <td>Preço por unidade</td>
+                <td>Data de adição</td>
+                <td>Tamanho (cm)</td>
             </thead>
             <tbody>
                 {% for item in items %}
@@ -21,9 +24,11 @@
                     <td>{{item.product.name}}</td>
                     <td>{{item.quantity}}</td>
                     <td>{{item.fullPrice}}</td>
+                    <td>{{item.product.price}}</td>
                     <td>{{item.datetime}}</td>
-                    <td><a href="{% url 'cart:add' item.product.slug %}">Adicionar 1</a></td>
-                    <td><a href="{% url 'cart:deleteItem' item.itemName%}">Deletar</a></td>
+                    <td>{{item.size}}</td>
+                    <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
+                    <td><a href="{% url 'cart:deleteItem' item.itemName %}">Deletar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

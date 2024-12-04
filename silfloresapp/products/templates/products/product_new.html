@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% load static %}
+
 {% block title%}
     New Product
 {% endblock %}
@@ -10,9 +12,9 @@
         <form class="form" action="{% url "products:new" %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{product_form.as_p}}
-            {{tag_form.as_p}}
             {{photo_form}}
             <button class="form-submit">Create Product</button>
         </form>
     </section>
+    <script src="{% static "js/size_product.js" %}"></script>
 {% endblock %}

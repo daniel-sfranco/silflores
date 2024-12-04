@@ -30,18 +30,21 @@ class ProductForm(forms.ModelForm):
     tags = forms.CharField(required=False, widget=forms.Textarea)
     class Meta:
         model = models.Product
-        fields = ['name', 'price', 'desc', 'size_type', 'size', 'term', 'stock', 'tags']
+        fields = ['name', 'price', 'desc', 'term', 'stock', 'tags', 'size_type', 'size']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['tags'].widget = forms.Textarea()
         self.fields['tags'].help_text = "Insira as tags separadas por vírgula"
+        self.fields['size'].help_text = "Insira os tamanhos separados por espaço"
+        self.fields['size'].label = "Tamanho(cm)"
 
 class ProductChangeForm(forms.ModelForm):
+    size = forms.CharField(required=False)
     tags = forms.CharField(required=False, widget=forms.Textarea)
     class Meta:
         model = models.Product
-        fields = ['name', 'price', 'desc', 'size_type', 'size', 'term', 'stock']
+        fields = ['name', 'price', 'desc', 'term', 'stock','size_type']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -52,3 +55,4 @@ class ProductChangeForm(forms.ModelForm):
             self.fields['tags'].initial = tag_names
         self.fields['tags'].widget = forms.Textarea()
         self.fields['tags'].help_text = "Insira as tags separadas por vírgula"
+        self.fields['size'].help_text = "Insira os tamanhos separados por vírgula"

@@ -9,6 +9,7 @@ Register
 <form class="form" action="/user/register/" method="post">
     {% csrf_token %}
     {{ form }}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
     <button class="form-submit">Submit</button>
 </form>
 {% endblock %}

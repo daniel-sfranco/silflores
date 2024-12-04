@@ -1,7 +1,7 @@
 const btnDelete = document.getElementById('btnDelete');
 const modalDelete = document.querySelector('.modalDelete');
-const btnCancel = document.getElementById('btnCancel');
-const btnConfirm = document.getElementById('btnConfirm');
+const btnCancel = document.getElementById('deleteCancel');
+const btnConfirm = document.getElementById('deleteConfirm');
 const span = document.getElementsByClassName("close")[0];
 const deleteUrl = btnConfirm.dataset.deleteUrl;
 

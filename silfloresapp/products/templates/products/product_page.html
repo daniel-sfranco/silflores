@@ -3,10 +3,11 @@
 {% load static %}
 
 {% block title%}
-    {{product.page}}
+    {{product.name}}
 {% endblock %}
 
 {% block content%}
+    <p style="display:none;" data-size={{product.size}} data-slug={{product.slug}} data-auth={{user.is_authenticated}} id="data"></p>
     <section>
         <h1>{{product.page}}</h1>
             {% for image in product.photos.all %}
@@ -21,28 +22,55 @@
                 <li>{{tag.name}}</li>
             {% endfor %}
             </ul>
+            <p>Tipo de tamanho: {{product.get_size_type_display}}</p>
     </section>
+    {% if user.is_authenticated and user.is_superuser %}
+        <a href="{% url 'products:update' product.slug %}" class="form-submit">Atualizar Produto</a>
+        <a id="btnDelete" class="form-submit">Excluir Produto</a>
 
-    {% if user.is_superuser %}
-    <a href="{% url 'products:update' product.slug %}" class="form-submit">Atualizar Produto</a>
-    <button id="btnDelete" class="form-submit">Excluir Produto</button>
+        <div class="modalDelete modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <p>Tem certeza que deseja excluir esse produto?</p>
+                <div class="modal-footer">
+                    <button id="deleteCancel" class="form-submit">Cancelar</button>
+                    <button id="deleteConfirm" data-delete-url="{% url 'products:delete' product.slug %}" class="form-submit">Excluir</button>
+                </div>
+            </div>
+        </div>
+        <script src="{% static 'js/confirm_delete.js' %}"></script>
+    {% else %}
+        <button class="form-submit" id="btnSize" onclick="check_size({{user.is_authenticated}})">Adicionar ao carrinho</button>
+    {% endif %}
 
-    <div class="modalDelete modal">
+
+    <div class="modalSize modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Tem certeza que deseja excluir esse produto?</p>
+            <span class="close" id="closeSize">×</span>
+            {% if product.size_type == 'fixed' %}
+                {% for size in sizes %}
+                    <p>Tamanho: {{ size.size }}</p>
+                {% endfor %}
+            {% elif product.size_type == 'choice' %}
+                <p>Escolha um tamanho para o produto</p>
+                <select name="size" id="size">
+                    {% for size in sizes %}
+                        <option value="{{size.size}}">{{size.size}}</option>
+                    {% endfor %}
+                </select>
+            {% elif product.size_type == 'set' %}
+                <p>Escolha um tamanho para o produto</p>
+                <input type="text" id="size">
+            {% endif %}
+            <p>Digite a quantidade desejada</p>
+            <input type="number" id="quantity">
             <div class="modal-footer">
-                <button id="btnCancel" class="form-submit">Cancelar</button>
-                <button id="btnConfirm" data-delete-url="{% url 'products:delete' product.slug %}" class="form-submit">Excluir</button>
+                <button id="sizeCancel" class="form-submit">Cancelar</button>
+                <button data-product={{product.slug}} class="form-submit" id="sizeConfirm">Confirmar</button>
             </div>
         </div>
     </div>
-    <script src="{% static 'js/confirm_delete.js' %}"></script>
-    {% endif %}
-
-    <a class="form-submit" href="{% url 'cart:add' product.slug %}">Adicionar ao carrinho</a>
-
-    {% if product.size_type == 'choice' %}{% endif %}
+    <script src="{% static "js/size_choice.js" %}"></script>
 
 
 {% endblock%}
