@@ -9,10 +9,18 @@ from products.models import Product
 from django.utils import timezone
 # Create your views here.
 
+def cartitem_getsize(request, slug):
+    item = Product.objects.get(slug=slug)
+    return HttpResponse(item.size)
+
 @login_required(login_url="/user/login")
 def cart_page(request):
     cart = Cart.objects.get(user=request.user)
-    return render(request, 'cart/cart_page.html', {'user': request.user, 'cart': cart, 'items': cart.cartitem_set.order_by('-datetime')})
+    items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
+    products = [cartitem.product for cartitem in items]
+    superusers = CustomUser.objects.filter(is_superuser=True)
+    sizes = CartItem.objects.filter(product__in=products, cart__user__in=superusers)
+    return render(request, 'cart/cart_page.html', {'user': request.user, 'cart': cart, 'items': items, 'sizes': sizes})
 
 
 @login_required(login_url='/user/login')
@@ -34,7 +42,17 @@ def cart_add(request):
         cartItem[0].save()
     else:
         cartItem = CartItem(product=product, cart=cart, quantity=quantity, itemName=f"{request.user.username}_{product.slug}", fullPrice=product.price * quantity, sizeType=product.size_type, size=size)
-        cartItem.save()
+    actCartItem = CartItem.objects.filter(product=product).filter(cart=cart).filter(size="A definir")
+    if(actCartItem):
+        actCartItem = actCartItem[0]
+        actCartItem.quantity -= quantity
+        actCartItem.fullPrice -= product.price * quantity
+        cart.fullPrice -= product.price * quantity
+        cart.products -= quantity
+        actCartItem.save()
+        if(actCartItem.quantity == 0):
+            actCartItem.delete()
+    cartItem.save()
     cart.products += quantity
     cart.fullPrice += product.price * quantity
     cart.save()
@@ -47,11 +65,20 @@ def cart_add(request):
 
 
 @login_required(login_url='/user/login')
-def cart_deleteItem(request, slug):
+def cart_deleteItem(request, pk):
     user = CustomUser.objects.get(username=request.user.username)
     cart = user.cart
-    cartItem = CartItem.objects.filter(itemName=slug)[0]
+    cartItem = CartItem.objects.get(pk=pk)
     if cartItem:
+        actCartItem = CartItem.objects.filter(product=cartItem.product).filter(cart=cart).filter(size="A definir")
+        if(actCartItem):
+            actCartItem = actCartItem[0]
+            if(actCartItem != cartItem):
+                actCartItem.quantity += cartItem.quantity
+                actCartItem.fullPrice += cartItem.fullPrice
+                cart.fullPrice += cartItem.fullPrice
+                cart.products += cartItem.quantity
+                actCartItem.save()
         cart.fullPrice -= cartItem.fullPrice
         cart.products -= cartItem.quantity
         cartItem.delete()

@@ -7,22 +7,30 @@ Seu perfil
 {% endblock %}
 
 {% block content %}
-    <h1>Seu perfil</h1>
-    <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+    {% if user.username == profile.username %}
+        <h1>Seu perfil</h1>
+        <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+        <p>Nome Cadastrado: {{profile.name}}</p>
+        {% else %}
+        <h1>{{profile.name}}</h1>
+        <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+        {% endif %}
     <p>Nome de Usuário: {{profile.username}}</p>
     <p>Email: {{profile.email}}</p>
-    <a href="{% url "users:update" %}">Update profile</a>
-    <button id="btnDelete" class="form-submit">Excluir Conta</button>
+    {% if user.username == profile.username %}
+        <a href="{% url "users:update" %}">Update profile</a>
+        <button id="btnDelete" class="form-submit">Excluir Conta</button>
 
-    <div] class="modalDelete modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Tem certeza que deseja excluir sua conta?</p>
-            <div class="modal-footer">
-                <button id="deleteCancel" class="form-submit">Cancelar</button>
-                <button id="deleteConfirm" data-delete-url="{% url 'users:delete' %}" class="form-submit">Excluir</button>
+        <div class="modalDelete modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p>Tem certeza que deseja excluir sua conta?</p>
+                <div class="modal-footer">
+                    <button id="deleteCancel" class="form-submit">Cancelar</button>
+                    <button id="deleteConfirm" data-delete-url="{% url 'users:delete' %}" class="form-submit">Excluir</button>
+                </div>
             </div>
         </div>
-    </div>
-    <script src="{% static 'js/confirm_delete.js' %}"></script>
+        <script src="{% static 'js/confirm_delete.js' %}"></script>
+    {% endif %}
 {% endblock %}

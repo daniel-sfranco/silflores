@@ -13,7 +13,6 @@ for(let i = 0; i < photos.length; i++){
     photos[i].addEventListener('click', function() {
         deleted = this;
         photoModalDelete.style.display = 'block';
-        console.log(deleted.dataset.deleteUrl);
     })
 }
 

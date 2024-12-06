@@ -65,8 +65,9 @@ def user_update(request):
         form = CustomUserChangeForm(instance=instance)
     return render(request, 'users/user_update.html', {"form": form})
 
-def user_profile(request):
-    return render(request, 'users/user_profile.html', {'profile': request.user})
+def user_profile(request, username):
+    user = CustomUser.objects.get(username=username)
+    return render(request, 'users/user_profile.html', {'profile': user})
 
 def user_delete(request):
     user = CustomUser.objects.get(username = request.user.username)

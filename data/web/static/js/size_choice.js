@@ -1,26 +1,67 @@
+const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
 const modalSize = document.querySelector(".modalSize");
 const spanClose = document.getElementById("closeSize");
-const btnSetSize = document.getElementById("btnSize");
-const sizeSelect = document.getElementById("size"); // Use "sizeSelect" for the select element
+const btnSizeElements = document.getElementsByClassName("btnSize");
+const btnAddCart = document.getElementById("btnAddCart");
+let sizeSelect = document.getElementById("size");
 const sizeCancel = document.getElementById("sizeCancel");
 const sizeConfirm = document.getElementById('sizeConfirm');
 const data = document.getElementById("data")
-let selectQty = document.getElementById("quantity")
-let selectedSize = parseFloat(data.dataset.size); // Store the selected size
-const productSlug = data.dataset.slug;
-let authenticated = data.dataset.auth;
+const selectQty = document.getElementById("quantity")
+const sizeOptions = document.querySelectorAll(".option");
+const sizeDiv = document.getElementById("chooseSize");
+const textQuantity = document.getElementById("pQuantity");
+let authenticated = document.getElementById("data").getAttribute("data-auth")
+let productSlug = '';
 
 
-sizeConfirm.onclick = click;
+sizeConfirm.onclick = function() {
+    if(sizeSelect.value != '' && productSlug != ''){
+        click()
+    }
+};
 
-btnSetSize.onclick = function () {
+btnAddCart.onclick = function () {
     if(authenticated == 'True'){
         modalSize.style.display = "block";
-        selectedSize = parseFloat(sizeSelect.value);
+        productSlug = btnAddCart.getAttribute('data-slug');
     } else {
         window.location.href = '/user/login?next=' + encodeURIComponent(window.location.href);
     }
 };
+
+Array.from(btnSizeElements).forEach(btn => {
+    btn.onclick = function() {
+        productSlug = btn.getAttribute('data-slug');
+        fetch('/cart/' + productSlug + '/getsize', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(data => data.text())
+        .then(data => {
+            let array = data.split(' ')
+            console.log(array)
+            if(array[0] != ''){
+                let newHtml =`<p>Escolha um tamanho para o produto</p>
+                <select name="size" id="size">`
+                for(let i = 0; i < array.length; i++){
+                    newHtml += '<option value=' + array[i] + ' class="option">' + array[i] + '</option>'
+                }
+                newHtml += "</select>"
+                sizeDiv.innerHTML = newHtml;
+            } else {
+                sizeDiv.innerHTML =
+                `<p>Escolha um tamanho para o produto</p>
+                <input type="text" id="size">`;
+            }
+            sizeSelect = document.getElementById("size");
+        })
+        modalSize.style.display = "block";
+    }
+})
 
 spanClose.onclick = function() {
     modalSize.style.display = "none";
@@ -30,14 +71,8 @@ sizeCancel.onclick = function() {
     modalSize.style.display = "none";
 };
 
-sizeSelect.addEventListener('change', function() {
-    selectedSize = parseFloat(sizeSelect.value);
-});
-
 
 function click () {
-    const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
-
     fetch('/cart/add', {
         method: 'POST',
         headers: {
@@ -46,19 +81,23 @@ function click () {
         },
         body: JSON.stringify({
             'slug': productSlug,
-            'size': selectedSize,
+            'size': sizeSelect.value,
             'quantity': parseInt(selectQty.value)
         })
     })
     .then(response => {
-        if (response.status == 200) {
+        if (!response.ok) {
+          if (response.status === 401) {
+            const next = new URL(window.location.href); // Pega a URL atual
+          } else {
+            console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
+          }
+        } else {
             modalSize.style.display = "none";
             window.location.href = '/cart'; // Redirect to the cart page
-        } else {
-            alert("Erro ao adicionar ao carrinho. Tente novamente.");
         }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+      })
+      .catch(error => {
+        console.error("Erro na solicitação:", error);
+      });
 }

@@ -11,7 +11,7 @@
     {% for cart in carts %}
         <hr>
         <p>Nome: {{cart.user.name}}</p>
-        <p>Usuário: {{cart.user.username}}</p>
+        <a href="{% url "users:profile" cart.user.username %}">Usuário: {{cart.user.username}}</a>
         <table class="cart-product-table">
             <thead>
                 <td>Produto</td>

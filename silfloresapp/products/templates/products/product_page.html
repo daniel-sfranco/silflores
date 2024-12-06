@@ -7,6 +7,11 @@
 {% endblock %}
 
 {% block content%}
+    {% if user.is_authenticated %}
+        <input type="hidden" name="auth" id="auth" data-auth="True">
+    {% else %}
+        <input type="hidden" name="auth" id="auth" data-auth="False">
+    {% endif %}
     <p style="display:none;" data-size={{product.size}} data-slug={{product.slug}} data-auth={{user.is_authenticated}} id="data"></p>
     <section>
         <h1>{{product.page}}</h1>
@@ -40,7 +45,7 @@
         </div>
         <script src="{% static 'js/confirm_delete.js' %}"></script>
     {% else %}
-        <button class="form-submit" id="btnSize" onclick="check_size({{user.is_authenticated}})">Adicionar ao carrinho</button>
+        <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
     {% endif %}
 
 
@@ -49,18 +54,10 @@
             <span class="close" id="closeSize">×</span>
             {% if product.size_type == 'fixed' %}
                 {% for size in sizes %}
-                    <p>Tamanho: {{ size.size }}</p>
+                    <input type="hidden" id="size" value="{{size.size}}">
                 {% endfor %}
-            {% elif product.size_type == 'choice' %}
-                <p>Escolha um tamanho para o produto</p>
-                <select name="size" id="size">
-                    {% for size in sizes %}
-                        <option value="{{size.size}}">{{size.size}}</option>
-                    {% endfor %}
-                </select>
-            {% elif product.size_type == 'set' %}
-                <p>Escolha um tamanho para o produto</p>
-                <input type="text" id="size">
+            {% else %}
+                <input type="hidden" id="size" value="A definir">
             {% endif %}
             <p>Digite a quantidade desejada</p>
             <input type="number" id="quantity">

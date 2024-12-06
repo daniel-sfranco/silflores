@@ -49,14 +49,13 @@ def product_new(request, product_id=None):
             if(product.size_type == 'choice'):
                 sizeOptions = [float(s) for s in product.size.split() if len(s) > 0]
                 i = 0
-                sizeObjects = []
                 for size in sizeOptions:
                     actItem = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=size, sizeType=product.size_type)
                     actItem.save()
                     i += 1
             elif(product.size_type == 'fixed'):
                 price = float(product.price)
-                size = float(product.size.strip())
+                size = product.size.strip()
                 sizeObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=price, size=size, sizeType=product.size_type)
                 sizeObject.save()
             return redirect('products:list')

@@ -28,6 +28,6 @@ RUN python -m venv /venv && \
 
 ENV PATH="/scripts:/venv/bin:$PATH"
 
-USER duser
+USER root
 
 CMD ["commands.sh"]

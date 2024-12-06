@@ -40,7 +40,7 @@
                 {% else %}
                     <a href="{% url "cart:page" %}">Cart</a>
                 {% endif %}
-                <a href="{% url "users:profile" %}">Profile</a>
+                <a href="{% url "users:profile" user.username %}">Profile</a>
                 <form id='logout' action = "{% url 'users:logout' %}" method="POST">
                     {% csrf_token %}
                     <button id='logout-button'>Logout</button>

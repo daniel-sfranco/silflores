@@ -19,7 +19,7 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     fullPrice = models.DecimalField(default=0, decimal_places=2, max_digits=6)
-    size = models.FloatField(default=0)
+    size = models.CharField(blank=True)
     sizeType = models.CharField(default='')
 
     def __str__(self):

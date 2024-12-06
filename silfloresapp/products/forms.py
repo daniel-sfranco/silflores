@@ -38,6 +38,7 @@ class ProductForm(forms.ModelForm):
         self.fields['tags'].help_text = "Insira as tags separadas por vírgula"
         self.fields['size'].help_text = "Insira os tamanhos separados por espaço"
         self.fields['size'].label = "Tamanho(cm)"
+        self.fields['size'].required = False
 
 class ProductChangeForm(forms.ModelForm):
     size = forms.CharField(required=False)
@@ -56,3 +57,5 @@ class ProductChangeForm(forms.ModelForm):
         self.fields['tags'].widget = forms.Textarea()
         self.fields['tags'].help_text = "Insira as tags separadas por vírgula"
         self.fields['size'].help_text = "Insira os tamanhos separados por vírgula"
+        self.fields['size'].label = "Tamanho(cm)"
+        self.fields['size'].required = False

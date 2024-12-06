@@ -1,10 +1,18 @@
 {% extends "layout.html" %}
 
+{% load static %}
+
 {% block title %}
     Cart
 {% endblock %}
 
 {% block content %}
+    {% if user.is_authenticated %}
+        <input type="hidden" name="auth" id="data" data-auth="True">
+    {% else %}
+        <input type="hidden" name="auth" id="data" data-auth="False">
+    {% endif %}
+    <input type="hidden" name="add" id="btnAddCart">
     <h1>Cart Page</h1>
     <p>{{user.name}}</p>
     {% if items %}
@@ -26,9 +34,13 @@
                     <td>{{item.fullPrice}}</td>
                     <td>{{item.product.price}}</td>
                     <td>{{item.datetime}}</td>
-                    <td>{{item.size}}</td>
+                    {% if item.size == "A definir" %}
+                        <td><a class="btnSize" data-slug="{{item.product.slug}}" data-size={{item.size}}>{{item.size}}</a></td>
+                    {% else %}
+                        <td><p class="btnSize" data-slug="{{item.product.slug}}" data-size={{item.size}}>{{item.size}}</a></td>
+                    {% endif %}
                     <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
-                    <td><a href="{% url 'cart:deleteItem' item.itemName %}">Deletar</a></td>
+                    <td><a href="{% url 'cart:deleteItem' item.pk %}">Deletar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -38,6 +50,20 @@
                 </tr>
             </tfoot>
         </table>
+
+        <div class="modalSize modal">
+            <div class="modal-content">
+                <span class="close" id="closeSize">×</span>
+                <div id="chooseSize"></div>
+                <p id="pQuantity">Digite a quantidade desejada (no máximo {quantity})</p>
+                <input type="number" id="quantity">
+                <div class="modal-footer">
+                    <button id="sizeCancel" class="form-submit">Cancelar</button>
+                    <button class="form-submit" id="sizeConfirm">Confirmar</button>
+                </div>
+            </div>
+        </div>
+        <script src="{% static "js/size_choice.js" %}"></script>
     {% endif %}
     <p>Preço total: R${{cart.fullPrice}}</p>
 {% endblock content %}

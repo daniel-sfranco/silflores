@@ -93,8 +93,8 @@ section {
 }
 
 .product_photo {
-    width: 25rem;
-    height: 25rem;
+    width: 15rem;
+    height: 15rem;
     object-fit: contain;
 }
 
