@@ -40,13 +40,14 @@
                 {% else %}
                     <a href="{% url "cart:page" %}">Cart</a>
                 {% endif %}
-                <a href="{% url "users:profile" user.username %}">Profile</a>
-                <form id='logout' action = "{% url 'users:logout' %}" method="POST">
+
+                <a href="{% url "profile" user.username %}">Profile</a>
+                <form id='logout' action = "{% url 'logout' %}" method="POST">
                     {% csrf_token %}
                     <button id='logout-button'>Logout</button>
                 </form>
             {% else %}
-                <a href="{% url 'users:login' %}">Login</a>
+                <a href="{% url 'login' %}">Login</a>
             {% endif %}
         </div>
 

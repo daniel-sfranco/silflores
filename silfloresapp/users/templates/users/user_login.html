@@ -6,15 +6,15 @@ Login
 
 {% block content %}
 <h1>Login with user</h1>
-<form class="form" action="{% url 'users:login' %}" method="post">
+<form class="form" action="{% url 'login' %}" method="post">
     {% csrf_token %}
     {{ form }}
     {% if request.GET.next %}
     <input type="hidden" name="next" value="{{request.GET.next}}"/>
     {% endif %}
     <button class="form-submit">Submit</button>
+    <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
 </form>
-
 <button onclick="redirect()" class="form-submit">Register</button>
 <script>
     function redirect(){
@@ -26,5 +26,6 @@ Login
             window.location.href = '/user/register/'
         }
     }
+
 </script>
 {% endblock %}

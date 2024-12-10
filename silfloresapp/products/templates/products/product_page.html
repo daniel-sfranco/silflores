@@ -27,7 +27,9 @@
                 <li>{{tag.name}}</li>
             {% endfor %}
             </ul>
-            <p>Tipo de tamanho: {{product.get_size_type_display}}</p>
+            {% if product.size == 'set' %}
+                <p>INFORMAR O TAMANHO NO ATO DA COMPRA</p>
+            {% endif %}
     </section>
     {% if user.is_authenticated and user.is_superuser %}
         <a href="{% url 'products:update' product.slug %}" class="form-submit">Atualizar Produto</a>
@@ -45,29 +47,44 @@
         </div>
         <script src="{% static 'js/confirm_delete.js' %}"></script>
     {% else %}
+        <input type="number" id="quantityInput">
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
+
+        <script>
+            const addButton = document.getElementById("btnAddCart");
+            const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+            const quantity = document.getElementById("quantityInput")
+            const slug = addButton.getAttribute("data-slug")
+            addButton.onclick = function(){
+                fetch('/cart/add', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        'slug': slug,
+                        'quantity': quantity.value,
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                      if (response.status === 401) {
+                        const next = new URL(window.location.href); // Pega a URL atual
+                        window.location.href = '/user/login?next=', next
+                      } else {
+                        console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
+                      }
+                    } else {
+                        window.location.href = '/cart'; // Redirect to the cart page
+                    }
+                  })
+                  .catch(error => {
+                    console.error("Erro na solicitação:", error);
+                  });
+            }
+        </script>
     {% endif %}
-
-
-    <div class="modalSize modal">
-        <div class="modal-content">
-            <span class="close" id="closeSize">×</span>
-            {% if product.size_type == 'fixed' %}
-                {% for size in sizes %}
-                    <input type="hidden" id="size" value="{{size.size}}">
-                {% endfor %}
-            {% else %}
-                <input type="hidden" id="size" value="A definir">
-            {% endif %}
-            <p>Digite a quantidade desejada</p>
-            <input type="number" id="quantity">
-            <div class="modal-footer">
-                <button id="sizeCancel" class="form-submit">Cancelar</button>
-                <button data-product={{product.slug}} class="form-submit" id="sizeConfirm">Confirmar</button>
-            </div>
-        </div>
-    </div>
-    <script src="{% static "js/size_choice.js" %}"></script>
 
 
 {% endblock%}

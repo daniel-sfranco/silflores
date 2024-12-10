@@ -50,20 +50,6 @@
                 </tr>
             </tfoot>
         </table>
-
-        <div class="modalSize modal">
-            <div class="modal-content">
-                <span class="close" id="closeSize">×</span>
-                <div id="chooseSize"></div>
-                <p id="pQuantity">Digite a quantidade desejada (no máximo {quantity})</p>
-                <input type="number" id="quantity">
-                <div class="modal-footer">
-                    <button id="sizeCancel" class="form-submit">Cancelar</button>
-                    <button class="form-submit" id="sizeConfirm">Confirmar</button>
-                </div>
-            </div>
-        </div>
-        <script src="{% static "js/size_choice.js" %}"></script>
     {% endif %}
     <p>Preço total: R${{cart.fullPrice}}</p>
 {% endblock content %}

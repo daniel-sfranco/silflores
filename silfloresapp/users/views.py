@@ -1,11 +1,13 @@
+import json
+from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import JsonResponse
 from django.urls import reverse
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
 from django.contrib.auth import login, logout
 from cart.models import Cart
+from django.core.mail import EmailMessage
 
 # Create your views here.
 
@@ -77,3 +79,20 @@ def user_delete(request):
     cart.delete()
     user.delete()
     return redirect('home')
+
+
+
+class PasswordResetView(auth_views.PasswordResetView):
+    template_name = 'users/password_reset_form.html'
+
+
+class PasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = 'users/password_reset_done.html'
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'users/password_reset_confirm.html'
+
+
+class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'users/password_reset_complete.html'

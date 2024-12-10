@@ -11,7 +11,7 @@
     {% for cart in carts %}
         <hr>
         <p>Nome: {{cart.user.name}}</p>
-        <a href="{% url "users:profile" cart.user.username %}">Usuário: {{cart.user.username}}</a>
+        <a href="{% url "profile" cart.user.username %}">Usuário: {{cart.user.username}}</a>
         <table class="cart-product-table">
             <thead>
                 <td>Produto</td>
@@ -19,7 +19,6 @@
                 <td>Preço</td>
                 <td>Preço por unidade</td>
                 <td>Data de adição</td>
-                <td>Tamanho (cm)</td>
             </thead>
             <tbody>
                 {% for item in items|get:cart.id %}
@@ -29,7 +28,6 @@
                         <td>{{item.fullPrice}}</td>
                         <td>{{item.product.price}}</td>
                         <td>{{item.datetime}}</td>
-                        <td>{{item.size}}</td>
                         <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
                     </tr>
                 {% endfor %}

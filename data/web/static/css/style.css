@@ -3,10 +3,15 @@
     padding: 0;
     box-sizing: border-box;
 }
+:root {
+    --back: white;
+    --title:#bf5b87;
+    --backnav: #f3e1e9;
+}
 
 body {
     min-height: 100vh;
-    background-color: white;
+    background-color: var(--back);
     color: black;
     font-size: 1rem;
 }
@@ -14,7 +19,7 @@ body {
 nav {
     width: 100%;
     padding: 0.5rem;
-    background-color: #f3e1e9;
+    background-color: var(--backnav);
     font-size: 1rem;
     display: flex;
 }
@@ -46,12 +51,12 @@ p {
 }
 
 h1{
-    color: #bf5b87;
+    color: var(--title);
 }
 
 a {
     text-decoration: none;
-    color: #bf5b87;
+    color: var(--title);
 }
 
 a:hover {
@@ -105,10 +110,10 @@ section {
 .form-submit {
     padding: 0.5rem;
     border-radius: 10px;
-    width: 125px;
+    width: 10rem;
     border: none;
-    background-color: #f3e1e9;
-    color:#bf5b87;
+    background-color: var(--backnav);
+    color:var(--title);
 }
 
 .modal {
@@ -160,7 +165,7 @@ section {
     background-color: rgb(0, 0, 0, 0);
     border: none;
     margin: 0.5rem;
-    color: #bf5b87;
+    color: var(--title);
     font-family: "liberation serif";
 }
 
@@ -174,4 +179,16 @@ section {
 .cart-product-table {
     width: 100%;
     border: 1px solid black;
+}
+
+#passRecover {
+    background-color: var(--back);
+    border: none;
+    width: 10rem;
+    text-align:left;
+    color: var(--title);
+}
+
+#passRecover:hover {
+    opacity: .85;
 }

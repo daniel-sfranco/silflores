@@ -9,16 +9,14 @@ class Tag(models.Model):
 
 
 class Product(models.Model):
-    size_types = {
+    sizes = {
         'fixed': 'Tamanho único',
-        'choice': 'Selecionar tamanho',
         'set': 'Definir valor'
     }
     name = models.CharField(max_length=150, verbose_name="Nome do Produto")
     price = models.DecimalField(decimal_places=2, max_digits=6, null=True, verbose_name="Preço")
     desc = models.TextField(default='', verbose_name="Descrição")
-    size_type = models.CharField(choices=size_types, default='', verbose_name='Tipo de tamanho')
-    size = models.CharField(default='', verbose_name='Tamanho (cm)')
+    size = models.CharField(choices=sizes, default='', verbose_name='Tipo de tamanho')
     term = models.IntegerField(blank=True, verbose_name='Prazo de produção')
     stock = models.IntegerField(default=0, verbose_name='Estoque (0 para encomenda)')
     tags = models.ManyToManyField(Tag)

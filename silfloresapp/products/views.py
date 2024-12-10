@@ -14,9 +14,7 @@ def products_list(request):
 
 def product_page(request, slug):
     product = Product.objects.get(slug=slug)
-    superusers = CustomUser.objects.filter(is_superuser=True)
-    sizes = CartItem.objects.filter(cart__user__in=superusers).filter(product=product)
-    return render(request, 'products/product_page.html', {'product': product, 'sizes': sizes})
+    return render(request, 'products/product_page.html', {'product': product})
 
 
 @login_required(login_url="/user/login/")
@@ -35,7 +33,6 @@ def product_new(request, product_id=None):
         if product_form.is_valid():
             product = product_form.save(commit=False)
             product.slug = check_slug(product.name)
-            product.size = product.size.replace(',', '.')
             tags = tag_list(product_form.cleaned_data['tags'])
             product.numPhotos = len(request.FILES.getlist('images'))
             product.save()
@@ -46,18 +43,6 @@ def product_new(request, product_id=None):
                     i += 1
                     photo.save()
             product.tags.set(tags)
-            if(product.size_type == 'choice'):
-                sizeOptions = [float(s) for s in product.size.split() if len(s) > 0]
-                i = 0
-                for size in sizeOptions:
-                    actItem = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=size, sizeType=product.size_type)
-                    actItem.save()
-                    i += 1
-            elif(product.size_type == 'fixed'):
-                price = float(product.price)
-                size = product.size.strip()
-                sizeObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=price, size=size, sizeType=product.size_type)
-                sizeObject.save()
             return redirect('products:list')
         else:
             photo_form = forms.PhotoForm
@@ -79,7 +64,7 @@ def product_delete(request, slug):
 @user_passes_test(lambda u: u.is_superuser)
 def product_update(request, slug):
     product = Product.objects.get(slug=slug)
-    product_size_type = product.size_type
+    product_size = product.size
     if request.POST:
         product_form = forms.ProductChangeForm(request.POST, instance=product)
         photo_form = forms.PhotoForm(request.POST, request.FILES, required=False);
@@ -94,16 +79,16 @@ def product_update(request, slug):
                     photo_counter += 1
                     photo.save()
             product.numPhotos = photo_counter
-            if(product.size_type != product_size_type):
+            if(product.size != product_size):
                 CartItem.objects.filter(cart=request.user.cart).filter(product=product).delete()
-                if(product.size_type == 'choice'):
+                if(product.size == 'choice'):
                     sizeOptions = [float(s.strip()) for s in product.size.split(",")]
                     i = 0
                     for size in sizeOptions:
-                        actObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=size, sizeType=product.size_type)
+                        actObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price)
                         actObject.save()
-                elif(product.size_type == 'fixed'):
-                    sizeObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=float(product.size), sizeType=product.size_type)
+                elif(product.size == 'fixed'):
+                    sizeObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=float(product.size))
                     sizeObject.save()
             product.save()
             tags = tag_list(product_form.cleaned_data['tags'])

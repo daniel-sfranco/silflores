@@ -89,11 +89,12 @@ function click () {
         if (!response.ok) {
           if (response.status === 401) {
             const next = new URL(window.location.href); // Pega a URL atual
+            console.log(respose.statusText)
           } else {
             console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
           }
         } else {
-            modalSize.style.display = "none";
+            console.log('all right!');
             window.location.href = '/cart'; // Redirect to the cart page
         }
       })

@@ -4,6 +4,7 @@
 gunicorn-error-log
 __localcode
 notes/
+dotenv_files/.env
 
 # Django #
 *.log

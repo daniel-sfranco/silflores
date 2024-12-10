@@ -18,7 +18,7 @@ Seu perfil
     <p>Nome de Usuário: {{profile.username}}</p>
     <p>Email: {{profile.email}}</p>
     {% if user.username == profile.username %}
-        <a href="{% url "users:update" %}">Update profile</a>
+        <a href="{% url "updateUser" %}">Update profile</a>
         <button id="btnDelete" class="form-submit">Excluir Conta</button>
 
         <div class="modalDelete modal">
@@ -27,7 +27,7 @@ Seu perfil
                 <p>Tem certeza que deseja excluir sua conta?</p>
                 <div class="modal-footer">
                     <button id="deleteCancel" class="form-submit">Cancelar</button>
-                    <button id="deleteConfirm" data-delete-url="{% url 'users:delete' %}" class="form-submit">Excluir</button>
+                    <button id="deleteConfirm" data-delete-url="{% url 'deleteUser' %}" class="form-submit">Excluir</button>
                 </div>
             </div>
         </div>
