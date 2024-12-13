@@ -1,4 +1,6 @@
 from .models import Product, Tag
+from django.utils import timezone
+
 
 def check_slug(name):
     split_name = name.lower().split()
@@ -16,4 +18,7 @@ def tag_list(tag_text: str):
     new_tags = [Tag(name=tag) for tag in tags if tag not in existing_tags.values_list('name', flat=True)]
     Tag.objects.bulk_create(new_tags)
     all_tags = Tag.objects.filter(name__in=tags)
+    for tag in all_tags:
+        tag.lastChanged = timezone.now()
+        tag.numProducts += 1
     return all_tags

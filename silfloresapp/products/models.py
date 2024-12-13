@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 class Tag(models.Model):
     name = models.CharField(max_length=50)
+    lastChanged = models.DateTimeField(auto_now_add=True)
+    numProducts = models.IntegerField(default=0)
 
     def __str__(self) -> str:
         return str(self.name)

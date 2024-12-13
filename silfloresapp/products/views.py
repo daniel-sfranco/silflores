@@ -1,15 +1,49 @@
+import json
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from .models import Product, Photo, Tag
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
 from . import forms
 from .product_handler import check_slug, tag_list
-from users.models import CustomUser
 from cart.models import CartItem
 
 
-def products_list(request):
-    products = Product.objects.all().order_by('name')
-    return render(request, 'products/products_list.html', {'products': products})
+def product_collections(request):
+    tags = Tag.objects.exclude(name='all').order_by('-lastChanged')
+    return render(request, 'products/product_collections.html', {'tags': tags})
+
+
+def products_list(request, tagName):
+    tags = []
+    lowerPrice = 0
+    upperPrice = 10000
+    if(request.method == "POST"):
+        data = json.loads(request.body)
+        products = Product.objects.all()
+        if data['selectedTags']:
+            tags = [tag for tag in Tag.objects.filter(name__in=data['selectedTags'])]
+            products = products.filter(tags__in=tags)
+        if 'lowerPrice' in data.keys():
+            print(data['lowerPrice'])
+            lowerPrice = int(data['lowerPrice'])
+            products = products.filter(price__gte=lowerPrice)
+        if 'upperPrice' in data.keys():
+            print(data['upperPrice'])
+            upperPrice = int(data['upperPrice'])
+            products = products.filter(price__lte=upperPrice)
+        if data['stockAvaliable']:
+            products = products.exclude(stock=0)
+        product_list = []
+        for product in products:
+            json_formatted = {'name': product.name, 'price': product.price, 'slug': product.slug}
+            if json_formatted not in product_list:
+                product_list.append(json_formatted)
+        return JsonResponse({"products": product_list})
+    else:
+        tags = [Tag.objects.get(name=tagName)]
+        products = Product.objects.filter(tags__in=tags).filter(price__lte=upperPrice).filter(price__gte=lowerPrice)
+        return render(request, 'products/products_list.html', {'products': products, 'tags': Tag.objects.all(), 'actual': tagName})
 
 
 def product_page(request, slug):
@@ -33,7 +67,7 @@ def product_new(request, product_id=None):
         if product_form.is_valid():
             product = product_form.save(commit=False)
             product.slug = check_slug(product.name)
-            tags = tag_list(product_form.cleaned_data['tags'])
+            tags = tag_list(product_form.cleaned_data['tags'] + ', todos')
             product.numPhotos = len(request.FILES.getlist('images'))
             product.save()
             if photo_form.is_valid():
@@ -43,7 +77,11 @@ def product_new(request, product_id=None):
                     i += 1
                     photo.save()
             product.tags.set(tags)
-            return redirect('products:list')
+            for tag in product.tags.all():
+                tag.lastChanged = timezone.now()
+                tag.numProducts += 1
+                tag.save()
+            return redirect('products:collections')
         else:
             photo_form = forms.PhotoForm
     else:
@@ -56,6 +94,11 @@ def product_new(request, product_id=None):
 @user_passes_test(lambda u:u.is_superuser)
 def product_delete(request, slug):
     product = Product.objects.get(slug=slug)
+    tags = product.tags.all()
+    for tag in tags:
+        tag.lastChanged = timezone.now()
+        tag.numProducts -= 1
+        tag.save()
     product.delete()
     return redirect('/products/')
 

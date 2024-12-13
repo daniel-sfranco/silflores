@@ -1,4 +1,3 @@
-import json
 from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm

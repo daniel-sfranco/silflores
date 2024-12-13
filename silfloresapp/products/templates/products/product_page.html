@@ -47,7 +47,7 @@
         </div>
         <script src="{% static 'js/confirm_delete.js' %}"></script>
     {% else %}
-        <input type="number" id="quantityInput">
+        <input type="number" id="quantityInput" placeholder="quantidade">
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
 
         <script>
@@ -56,35 +56,35 @@
             const quantity = document.getElementById("quantityInput")
             const slug = addButton.getAttribute("data-slug")
             addButton.onclick = function(){
-                fetch('/cart/add', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify({
-                        'slug': slug,
-                        'quantity': quantity.value,
+                if(quantity.value != ''){
+                    fetch('/cart/add', {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            'slug': slug,
+                            'quantity': quantity.value,
+                        })
                     })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                      if (response.status === 401) {
-                        const next = new URL(window.location.href); // Pega a URL atual
-                        window.location.href = '/user/login?next=', next
-                      } else {
-                        console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
-                      }
-                    } else {
-                        window.location.href = '/cart'; // Redirect to the cart page
-                    }
-                  })
-                  .catch(error => {
-                    console.error("Erro na solicitação:", error);
-                  });
+                    .then(response => {
+                        if (!response.ok) {
+                          if (response.status === 401) {
+                            const next = new URL(window.location.href); // Pega a URL atual
+                            window.location.href = '/user/login?next=', next
+                          } else {
+                            console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
+                          }
+                        } else {
+                            window.location.href = '/cart'; // Redirect to the cart page
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro na solicitação:", error);
+                    });
+                }
             }
         </script>
     {% endif %}
-
-
 {% endblock%}

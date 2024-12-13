@@ -24,7 +24,6 @@
                 <td>Preço</td>
                 <td>Preço por unidade</td>
                 <td>Data de adição</td>
-                <td>Tamanho (cm)</td>
             </thead>
             <tbody>
                 {% for item in items %}
@@ -34,11 +33,6 @@
                     <td>{{item.fullPrice}}</td>
                     <td>{{item.product.price}}</td>
                     <td>{{item.datetime}}</td>
-                    {% if item.size == "A definir" %}
-                        <td><a class="btnSize" data-slug="{{item.product.slug}}" data-size={{item.size}}>{{item.size}}</a></td>
-                    {% else %}
-                        <td><p class="btnSize" data-slug="{{item.product.slug}}" data-size={{item.size}}>{{item.size}}</a></td>
-                    {% endif %}
                     <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
                     <td><a href="{% url 'cart:deleteItem' item.pk %}">Deletar</a></td>
                 </tr>
