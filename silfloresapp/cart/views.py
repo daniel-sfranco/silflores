@@ -4,16 +4,18 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from users.models import CustomUser
-from .models import Cart, CartItem
+from .models import Cart, CartItem, Message
 from products.models import Product
 from django.utils import timezone
 # Create your views here.
 
 @login_required(login_url="/user/login")
-def cart_page(request):
-    cart = Cart.objects.get(user=request.user)
+def cart_page(request, username):
+    cart = Cart.objects.get(user__username=username)
     items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
-    return render(request, 'cart/cart_page.html', {'user': request.user, 'cart': cart, 'items': items})
+    cartUser = {'name': cart.user.name, 'username': cart.user.username}
+    user = CustomUser.objects.get(username=request.user.username)
+    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': user, 'messages': Message.objects.filter(cart=cart).order_by("datetime")})
 
 
 @login_required(login_url='/user/login')

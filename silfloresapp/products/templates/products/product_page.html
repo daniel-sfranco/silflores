@@ -8,7 +8,7 @@
 
 {% block content%}
     {% if user.is_authenticated %}
-        <input type="hidden" name="auth" id="auth" data-auth="True">
+        <input type="hidden" name="auth" id="auth" data-auth="True" data-user={{user.username}}>
     {% else %}
         <input type="hidden" name="auth" id="auth" data-auth="False">
     {% endif %}
@@ -51,6 +51,7 @@
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
 
         <script>
+            const authInput = document.getElementById("auth")
             const addButton = document.getElementById("btnAddCart");
             const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
             const quantity = document.getElementById("quantityInput")
@@ -77,7 +78,7 @@
                             console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);
                           }
                         } else {
-                            window.location.href = '/cart'; // Redirect to the cart page
+                            window.location.href = '/cart/' + authInput.getAttribute("data-user") + '/page'; // Redirect to the cart page
                         }
                     })
                     .catch(error => {

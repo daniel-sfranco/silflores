@@ -13,6 +13,7 @@ services:
       - ./dotenv_files/.env
     depends_on:
       - psql
+      - redis
     develop:
       watch:
         - action: rebuild
@@ -24,3 +25,7 @@ services:
       - ./data/postgres/data:/var/lib/postgresql/data/
     env_file:
       - ./dotenv_files/.env
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"

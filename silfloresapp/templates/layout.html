@@ -39,7 +39,7 @@
                 {% if user.is_superuser %}
                     <a href="{% url "cart:orders" %}">Pedidos</a>
                 {% else %}
-                    <a href="{% url "cart:page" %}">Carrinho</a>
+                    <a href="{% url "cart:page" user.username %}">Carrinho</a>
                 {% endif %}
 
                 <a href="{% url "profile" user.username %}">Perfil</a>

@@ -22,3 +22,12 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.cart.user.username}'s {self.product.name}"
+
+class Message(models.Model):
+    content = models.TextField()
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.datetime.day}/{self.datetime.month}/{self.datetime.year % 100} {self.datetime.hour}:{self.datetime.minute} - {self.sender.username}: {self.content}"

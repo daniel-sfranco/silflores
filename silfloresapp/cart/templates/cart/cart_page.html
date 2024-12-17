@@ -7,14 +7,10 @@
 {% endblock %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        <input type="hidden" name="auth" id="data" data-auth="True">
-    {% else %}
-        <input type="hidden" name="auth" id="data" data-auth="False">
-    {% endif %}
+    <input type="hidden" id="data" data-con="{{cartUser.username}}" data-user="{{user.username}}">
     <input type="hidden" name="add" id="btnAddCart">
     <h1>Cart Page</h1>
-    <p>{{user.name}}</p>
+    <p>{{cartUser.name}}</p>
     {% if items %}
         <h2>Produtos</h2>
         <table class="cart-product-table">
@@ -46,4 +42,15 @@
         </table>
     {% endif %}
     <p>Preço total: R${{cart.fullPrice}}</p>
+
+    <div id="chat">
+        <div id="messages">
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+        </div>
+        <input type="text"id="message-input">
+        <button id="send-message">Send</button>
+    </div>
+    <script src="{% static "js/websocket.js" %}"></script>
 {% endblock content %}

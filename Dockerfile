@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED 1
 
 COPY silfloresapp /silfloresapp
 COPY scripts /scripts
+COPY --from=redis:7-alpine3.20 /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 
 WORKDIR /silfloresapp
 
@@ -27,6 +28,8 @@ RUN python -m venv /venv && \
   apk add postgresql-client
 
 ENV PATH="/scripts:/venv/bin:$PATH"
+
+ENV REDIS_URL=redis://redis:6379/1
 
 USER root
 

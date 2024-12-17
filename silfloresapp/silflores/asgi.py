@@ -1,16 +1,8 @@
-"""
-ASGI config for silflores project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
-"""
-
 import os
+import django.core.asgi as dj_asgi
+import channels.routing #type:ignore
 
-from django.core.asgi import get_asgi_application
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'silflores.settings')
-
-application = get_asgi_application()
+application = dj_asgi.get_asgi_application()
+application = channels.routing.get_default_application()
