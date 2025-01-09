@@ -1,31 +1,22 @@
 {% extends 'layout.html' %}
 
+{% load static %}
+
 {% block title %}
 Login
 {% endblock %}
 
 {% block content %}
-<h1>Login with user</h1>
-<form class="form" action="{% url 'login' %}" method="post">
-    {% csrf_token %}
-    {{ form }}
-    {% if request.GET.next %}
-    <input type="hidden" name="next" value="{{request.GET.next}}"/>
-    {% endif %}
-    <button class="form-submit">Submit</button>
-    <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
-</form>
-<button onclick="redirect()" class="form-submit">Register</button>
-<script>
-    function redirect(){
-        const nextUrl = new URL(window.location.href);
-        const next = nextUrl.searchParams.get('next');
-        if(next){
-            window.location.href = '/user/register/?next=' + encodeURIComponent(next);
-        } else {
-            window.location.href = '/user/register/'
-        }
-    }
-
-</script>
+    <h1>Login with user</h1>
+    <form class="form" action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{request.GET.next}}"/>
+        {% endif %}
+        <button class="form-submit">Submit</button>
+        <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+    </form>
+    <button onclick="redirect()" class="form-submit">Register</button>
+    <script src="{% static "js/register_redirect.js" %}"></script>
 {% endblock %}
