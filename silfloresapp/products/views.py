@@ -25,11 +25,9 @@ def products_list(request, tagName):
             tags = [tag for tag in Tag.objects.filter(name__in=data['selectedTags'])]
             products = products.filter(tags__in=tags)
         if 'lowerPrice' in data.keys():
-            print(data['lowerPrice'])
             lowerPrice = int(data['lowerPrice'])
             products = products.filter(price__gte=lowerPrice)
         if 'upperPrice' in data.keys():
-            print(data['upperPrice'])
             upperPrice = int(data['upperPrice'])
             products = products.filter(price__lte=upperPrice)
         if data['stockAvaliable']:

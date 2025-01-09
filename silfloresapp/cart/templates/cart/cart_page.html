@@ -11,46 +11,39 @@
     <input type="hidden" name="add" id="btnAddCart">
     <h1>Cart Page</h1>
     <p>{{cartUser.name}}</p>
-    {% if items %}
-        <h2>Produtos</h2>
-        <table class="cart-product-table">
-            <thead>
-                <td>Produto</td>
-                <td>Quantidade</td>
-                <td>Preço</td>
-                <td>Preço por unidade</td>
-                <td>Data de adição</td>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-                    <td>{{item.product.name}}</td>
-                    <td>{{item.quantity}}</td>
-                    <td>{{item.fullPrice}}</td>
-                    <td>{{item.product.price}}</td>
-                    <td>{{item.datetime}}</td>
-                    <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
-                    <td><a href="{% url 'cart:deleteItem' item.pk %}">Deletar</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>Número de produtos: {{cart.products}}</td>
-                </tr>
-            </tfoot>
-        </table>
-    {% endif %}
-    <p>Preço total: R${{cart.fullPrice}}</p>
-
-    <div id="chat">
-        <div id="messages">
-            {% for message in messages %}
-                <p>{{message}}</p>
-            {% endfor %}
+    <section id="mainCartPage">
+        <div id="cartTable">
+            {% if items %}
+                <h2>Produtos</h2>
+                <table class="cart-product-table">
+                    <thead>
+                        <td>Produto</td>
+                        <td>Quantidade</td>
+                        <td>Preço</td>
+                        <td>Data de adição</td>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{item.product.name}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td>R${{item.fullPrice}}</td>
+                            <td>{{item.datetime}}</td>
+                            <td><a href="{% url 'products:page' item.product.slug %}">Página do Produto</a></td>
+                            <td><a href="{% url 'cart:deleteItem' item.pk %}">Deletar</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            <p>Número de produtos: {{cart.products}}</p>
+            <p>Preço total: R${{cart.fullPrice}}</p>
         </div>
-        <input type="text"id="message-input">
-        <button id="send-message">Send</button>
-    </div>
+        <div id="chat">
+            <div id="messages"></div>
+            <input type="text"id="message-input" autofocus>
+            <button id="send-message">Send</button>
+        </div>
+    </section>
     <script src="{% static "js/websocket.js" %}"></script>
 {% endblock content %}

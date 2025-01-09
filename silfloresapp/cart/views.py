@@ -55,7 +55,7 @@ def cart_deleteItem(request, pk):
         cart.products -= cartItem.quantity
         cartItem.delete()
         cart.save()
-    return redirect('/cart')
+    return redirect(f'/cart/{request.user.username}/page')
 
 
 @login_required(login_url='/user/login')
@@ -67,3 +67,18 @@ def cart_orders(request):
     for cart in carts:
         carts_items[cart.id] = cart.cartitem_set.order_by("-datetime")
     return render(request, 'cart/cart_visualization.html', {'carts':carts, 'items':carts_items})
+
+
+def get_messages(request, username):
+    cart = Cart.objects.get(user__username=username)
+    messagesQuery = Message.objects.filter(cart=cart).order_by("datetime")
+    messagesData = []
+    for message in messagesQuery:
+        messagesData.append({
+            'content': message.content,
+            'sender': message.sender.username,
+            'date': f'{message.datetime.day}/{message.datetime.month}/{message.datetime.year}',
+            'time': f'{message.datetime.hour}:{message.datetime.minute}'
+        })
+    print(messagesData)
+    return JsonResponse({'messages': messagesData, 'length': len(messagesData)})

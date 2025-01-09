@@ -298,3 +298,27 @@ section {
 #prices {
     margin: 0.5rem;
 }
+
+#chat {
+    display: block;
+    width: 38%;
+    padding-left: 2%;
+}
+
+#messages {
+    overflow: auto;
+    display: block;
+    height: 20rem;
+}
+
+#mainCartPage {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#cartTable {
+    width: 60%;
+}
