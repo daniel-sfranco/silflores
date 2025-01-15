@@ -8,7 +8,7 @@ Coleções
 <section>
     <h1>Coleções</h1>
     {% for tag in tags %}
-        {% if tag.numProducts > 0 %}
+        {% if tag.numProducts > 0 and tag.name != 'all' %}
             <a href="{% url "products:list" tag.name %}">{{tag.name}}</a>
             <p>Número de produtos: {{tag.numProducts}}</p>
             <p>Última atualização: {{tag.lastChanged}}</p>

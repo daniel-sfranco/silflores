@@ -10,6 +10,27 @@
     --backmenu: #f3e1e97b;
 }
 
+input::-webkit-input-placeholder { /* Para navegadores WebKit (Chrome, Safari) */
+    color: var(--title);
+    opacity: .65;
+}
+input:-moz-placeholder { /* Para Firefox */
+    color: var(--title);
+    opacity: .65;
+}
+input::-moz-placeholder { /* Para Firefox 19+ */
+    color: var(--title);
+    opacity: .65;
+}
+input:-ms-input-placeholder { /* Para Internet Explorer 10+ */
+    color: var(--title);
+    opacity: .65;
+}
+input::placeholder { /* Para navegadores modernos */
+    color: var(--title);
+    opacity: .65;
+}
+
 body {
     min-height: 100vh;
     background-color: var(--back);
@@ -84,9 +105,10 @@ section {
     gap: 0.5rem;
 }
 
-.form input {
+input {
     padding: 0.25rem;
     max-width: 300px;
+    outline: none;
 }
 
 .form select {
@@ -301,14 +323,17 @@ section {
 
 #chat {
     display: block;
-    width: 38%;
-    padding-left: 2%;
+    width: 28%;
+    margin-left: 2%;
+    margin-top: 1.75rem;
 }
 
 #messages {
+    border: 1px solid black;
     overflow: auto;
     display: block;
     height: 20rem;
+    margin-bottom: 0.5rem;
 }
 
 #mainCartPage {
@@ -320,5 +345,25 @@ section {
 }
 
 #cartTable {
-    width: 60%;
+    width: 70%;
+}
+
+#product-search {
+    margin: 0 1rem;
+    padding: 0.25rem;
+    border: none;
+    border-bottom: 1px solid var(--title);
+    background-color: var(--backnav);
+    flex-grow: 1;
+}
+
+#search-button {
+    font-size: 1rem;
+    background-color: var(--title);
+    border: none;
+    margin: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 1rem;
+    color: var(--backnav);
+    font-family: "liberation serif";
 }

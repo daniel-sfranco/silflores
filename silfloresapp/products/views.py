@@ -1,12 +1,15 @@
 import json
 from django.shortcuts import render, redirect
+from django.db.models import IntegerField, Count, Case, When
+from django.db.models.functions import Lower
 from django.utils import timezone
 from .models import Product, Photo, Tag
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from . import forms
-from .product_handler import check_slug, tag_list
+from .product_handler import check_slug, tag_list, count_matching_words
 from cart.models import CartItem
+from math import trunc
 
 
 def product_collections(request):
@@ -14,15 +17,22 @@ def product_collections(request):
     return render(request, 'products/product_collections.html', {'tags': tags})
 
 
-def products_list(request, tagName):
+def products_list(request, tagName, searchTerm=None):
     tags = []
     lowerPrice = 0
     upperPrice = 10000
+    if(searchTerm):
+        searchWords = searchTerm.strip().lower().split()
+        print(searchWords)
+    else:
+        searchWords = False
+
     if(request.method == "POST"):
         data = json.loads(request.body)
         products = Product.objects.all()
         if data['selectedTags']:
             tags = [tag for tag in Tag.objects.filter(name__in=data['selectedTags'])]
+            print(tags)
             products = products.filter(tags__in=tags)
         if 'lowerPrice' in data.keys():
             lowerPrice = int(data['lowerPrice'])
@@ -32,6 +42,11 @@ def products_list(request, tagName):
             products = products.filter(price__lte=upperPrice)
         if data['stockAvaliable']:
             products = products.exclude(stock=0)
+        if(searchWords):
+            products = sorted(products, key=lambda product: count_matching_words(searchWords, product.slug))
+            for product in products:
+                if(count_matching_words(searchWords, product.slug) == 0):
+                    products.remove(product)
         product_list = []
         for product in products:
             json_formatted = {'name': product.name, 'price': product.price, 'slug': product.slug}
@@ -41,7 +56,12 @@ def products_list(request, tagName):
     else:
         tags = [Tag.objects.get(name=tagName)]
         products = Product.objects.filter(tags__in=tags).filter(price__lte=upperPrice).filter(price__gte=lowerPrice)
-        return render(request, 'products/products_list.html', {'products': products, 'tags': Tag.objects.all(), 'actual': tagName})
+        if(searchWords):
+            products = sorted(products, key=lambda product: count_matching_words(searchWords, product.slug))
+            for product in products:
+                if(count_matching_words(searchWords, product.slug) == 0):
+                    products.remove(product)
+        return render(request, 'products/products_list.html', {'products': products, 'all': Tag.objects.get(name='all'), 'tags': Tag.objects.exclude(name='all').order_by('name'), 'actual': tagName})
 
 
 def product_page(request, slug):
@@ -65,7 +85,7 @@ def product_new(request, product_id=None):
         if product_form.is_valid():
             product = product_form.save(commit=False)
             product.slug = check_slug(product.name)
-            tags = tag_list(product_form.cleaned_data['tags'] + ', todos')
+            tags = tag_list(product_form.cleaned_data['tags'] + ', all')
             product.numPhotos = len(request.FILES.getlist('images'))
             product.save()
             if photo_form.is_valid():

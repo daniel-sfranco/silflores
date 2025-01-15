@@ -1,5 +1,8 @@
 from .models import Product, Tag
 from django.utils import timezone
+from math import ceil
+from django.db.models import Q, When, Sum, Case, IntegerField, F
+import functools
 
 
 def check_slug(name):
@@ -22,3 +25,11 @@ def tag_list(tag_text: str):
         tag.lastChanged = timezone.now()
         tag.numProducts += 1
     return all_tags
+
+
+def count_matching_words(searchWords, slug: str):
+    counter = 0
+    for word in searchWords:
+        if word in slug:
+            counter -= 1
+    return counter

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Opossum Search</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f0f0f0;
+}
+
+#header {
+  background-color: #fff;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+#logo {
+  float: left;
+  width: 100px;
+  height: 60px;
+}
+#logo img {
+   width: 100px;
+   height: auto;
+}
+#searchbox {
+  margin: 10px;
+  padding: 10px;
+  width: 700px;
+}
+
+#search {
+  width: 700px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+#footer {
+  text-align: center;
+  background-color: #eee;
+  padding: 10px;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Opossum_2.jpg/292px-Opossum_2.jpg" alt="Opossum">
+  </div>
+  <div id="searchbox">
+    <input type="text" id="search" placeholder="Search">
+    <button onclick="search()">Search</button>
+  </div>
+</div>
+
+<div id="results"></div>
+
+<div id="footer">
+  Powered by opossum search
+</div>
+
+
+<script>
+function search() {
+  let searchTerm = document.getElementById("search").value;
+  if (searchTerm) {
+    let newUrl = "https://www.google.com/search?q=opossum+" + searchTerm;
+    window.location.href = newUrl;
+  } else {
+      alert("Please enter a search term.");
+  }
+
+}
+</script>
+
+
+</body>
+</html>

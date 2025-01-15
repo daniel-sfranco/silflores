@@ -24,7 +24,9 @@
             <p>Tags:</p>
             <ul>
             {% for tag in product.tags.all %}
-                <li>{{tag.name}}</li>
+                {% if tag.name != 'all' %}
+                    <li>{{tag.name}}</li>
+                {% endif %}
             {% endfor %}
             </ul>
             {% if product.size == 'set' %}

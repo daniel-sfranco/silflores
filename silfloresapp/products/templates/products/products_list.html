@@ -13,6 +13,15 @@
             <button class="dropButton">Filtros</button>
             <div id="myDropdown" class="dropdownContent">
                 <h4>Tags</h4>
+                <label for="all" class='tag-checkbox'>
+                    {% if actual == 'all' %}
+                        <input type="checkbox" name='all' id='tag-all' class='checkbox-input' checked>
+                    {% else %}
+                        <input type="checkbox" name='all' id='tag-all' class='checkbox-input'>
+                    {% endif %}
+                    <span class="checkmark"></span>
+                    todos
+                </label>
                 {% for tag in tags %}
                     <label for="{{tag.name}}" class='tag-checkbox'>
                         {% if tag.name == actual  or actual == 'all' %}
