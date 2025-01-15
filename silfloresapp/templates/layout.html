@@ -10,6 +10,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <script src="https://kit.fontawesome.com/5a20b600e8.js" crossorigin="anonymous"></script>
+    {% csrf_token %}
     {% block js %}{% endblock %}
     <title>
         {% block title%}

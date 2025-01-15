@@ -49,7 +49,6 @@
         </div>
         <script src="{% static 'js/confirm_delete.js' %}"></script>
     {% else %}
-        <input type="number" id="quantityInput" placeholder="quantidade">
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
         <script src="{% static "js/product_page.js" %}"></script>
     {% endif %}

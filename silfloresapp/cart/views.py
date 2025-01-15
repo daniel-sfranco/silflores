@@ -26,10 +26,11 @@ def cart_add(request):
     cart = Cart.objects.get(user=request.user)
     data = json.loads(request.body)
     slug = data['slug']
-    quantity = int(data['quantity'])
+    quantity = 1
     product = Product.objects.get(slug=slug)
     cartItem = CartItem.objects.filter(product=product).filter(cart=cart)
     if cartItem:
+        quantity
         cartItem[0].quantity += quantity
         cartItem[0].fullPrice += product.price * quantity
         cartItem[0].datetime = timezone.now()
@@ -43,6 +44,23 @@ def cart_add(request):
     product.stock = max(product.stock - quantity, 0)
     product.save()
     return HttpResponse("Product correctly added to cart")
+
+
+def set_quantity(request):
+    data = json.loads(request.body)
+    pk = data['pk']
+    quantity = int(data['quantity'])
+    cartItem = CartItem.objects.get(pk=pk)
+    cart = cartItem.cart
+    actQuantity = cartItem.quantity
+    difQuantity = quantity - actQuantity
+    cartItem.quantity += difQuantity
+    cart.products += difQuantity
+    cartItem.fullPrice += difQuantity * cartItem.product.price
+    cart.fullPrice += difQuantity * cartItem.product.price
+    cartItem.save()
+    cart.save()
+    return JsonResponse({"message": "Success"})
 
 
 @login_required(login_url='/user/login')

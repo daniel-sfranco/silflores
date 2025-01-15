@@ -10,6 +10,6 @@ Register
         {% csrf_token %}
         {{ form }}
         <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <button class="form-submit">Submit</button>
+        <button class="form-submit" id="submit-button">Submit</button>
     </form>
 {% endblock %}
