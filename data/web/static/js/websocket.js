@@ -2,14 +2,12 @@ const actUser = document.getElementById("data").getAttribute("data-user");
 const cartUser = document.getElementById("data").getAttribute("data-con");
 const wsUrl = new URL(window.location.href);
 const ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
-const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
 const messageInput = document.getElementById("message-input");
 
 
 ws.onopen = () => {
     const messageList = document.getElementById('messages');
     if (messageList) {
-        let previousScrollTop = messageList.scrollTop;
         fetch(`/cart/${cartUser}/messages`, {
             method: "GET",
             headers: {
@@ -27,11 +25,21 @@ ws.onopen = () => {
                         lastDate = message.date
                         const dateP = document.createElement('p')
                         dateP.innerHTML = lastDate
+                        dateP.classList.add("dateP")
                         messageList.append(dateP)
                     }
                     const messageContent = document.createElement('p')
-                    messageContent.innerHTML = `${message.sender} ${message.time}: ${message.content}`
+                    messageContent.classList.add("messageContent")
+                    messageContent.innerHTML = message.content
+                    const messageTime = document.createElement('p')
+                    messageTime.classList.add('messageTime')
+                    messageTime.innerHTML = message.time
+                    if(message.sender == actUser){
+                        messageContent.style = "text-align: right"
+                        messageTime.style = "text-align: right"
+                    }
                     messageList.append(messageContent)
+                    messageList.append(messageTime)
                     messageList.scrollTop = messageList.scrollHeight;
                 })
             }

@@ -98,5 +98,4 @@ def get_messages(request, username):
             'date': f'{message.datetime.day}/{message.datetime.month}/{message.datetime.year}',
             'time': f'{message.datetime.hour}:{message.datetime.minute}'
         })
-    print(messagesData)
     return JsonResponse({'messages': messagesData, 'length': len(messagesData)})

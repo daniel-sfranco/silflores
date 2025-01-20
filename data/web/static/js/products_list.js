@@ -32,9 +32,10 @@ for(let j = 0; j < tagLabels.length; j++){
                 label.firstElementChild.checked = true;
                 numChecked++;
             }
-            if(numChecked == tagCheckboxes.length - 1 && allCheckbox.checked == false){
+            if(numChecked >= tagCheckboxes.length && allCheckbox.checked == false){
                 allCheckbox.checked = true;
-            } else {
+            }
+            if(numChecked < tagCheckboxes.length) {
                 allCheckbox.checked = false;
             }
         })

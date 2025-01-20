@@ -1,4 +1,4 @@
-function redirect(){
+function redirect_register(){
     const nextUrl = new URL(window.location.href);
     const next = nextUrl.searchParams.get('next');
     if(next){
