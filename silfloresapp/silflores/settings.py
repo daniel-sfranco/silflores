@@ -28,6 +28,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', 0)))
 
+PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
+PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')
+PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
+
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()
 ]

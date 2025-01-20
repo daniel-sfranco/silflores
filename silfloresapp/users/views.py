@@ -16,7 +16,7 @@ def user_register(request):
         form = CustomUserCreationForm(request.POST)
         if(form.is_valid()):
             user = form.save()
-            user.cart = Cart(user=user)
+            user.cart = Cart(user=user, status="open")
             user.cart.save()
             login(request, user)
             if(next_url):
