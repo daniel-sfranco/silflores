@@ -3,22 +3,20 @@ from django.conf import settings
 
 class PagSeguroAPI:
     BASE_URL = (
-        "https://ws.sandbox.pagseguro.uol.com.br"
+        "https://sandbox.api.pagseguro.com"
         if settings.PAGSEGURO_SANDBOX
-        else "https://ws.pagseguro.uol.com.br"
+        else "https://pagseguro.uol.com.br"
     )
 
     @staticmethod
     def generate_payment(data):
-        url = f"{PagSeguroAPI.BASE_URL}/v2/checkout"
-        headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-        payload = {
-            "email": settings.PAGSEGURO_EMAIL,
-            "token": settings.PAGSEGURO_TOKEN,
-            "currency": "BRL",
-            **data,
+        url = f"{PagSeguroAPI.BASE_URL}/checkouts"
+        headers = {
+            "accept": "*/*",
+            "Authorization": f"Bearer {settings.PAGSEGURO_TOKEN}",
+            "Content-type": "application/json"
         }
-        response = requests.post(url, headers=headers, data=payload)
+        response = requests.post(url, headers=headers, json=data)
         response.raise_for_status()
         return response.json()
 

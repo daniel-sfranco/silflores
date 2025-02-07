@@ -10,4 +10,6 @@ urlpatterns = [
     path('orders/all', views.cart_orders, name='orders'),
     path('<str:username>/messages', views.get_messages, name='messages'),
     path('setQuantity', views.set_quantity, name='quantity'),
+    path('<str:username>/processPayment', views.process_payment, name='processPayment'),
+    path("pagseguro/notification/", views.notification_handler, name="pagseguro_notification"),
 ]

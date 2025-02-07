@@ -8,9 +8,10 @@ class CustomUser(AbstractUser):
     photo = models.ImageField(blank=True, verbose_name="Foto de perfil (opcional)", default="fallback_user.png")
     cpf = models.CharField(verbose_name="CPF (só números)", unique=True, blank=True)
     email = models.EmailField(verbose_name="Email", unique=True)
-    phone = models.CharField(max_length=15, verbose_name="Telefone (só números)", blank=True)
+    phone = models.CharField(max_length=10, verbose_name="Telefone (só números)", blank=True)
+    ddd = models.IntegerField(blank=True, default=11, verbose_name="DDD")
     birthday = models.CharField(verbose_name="Data de Nascimento", blank=True)
-    cep = models.CharField(max_length=10, verbose_name="CEP", blank=True)
+    cep = models.CharField(max_length=9, verbose_name="CEP", blank=True)
     home_number = models.IntegerField(verbose_name="Número", default=0)
     complement = models.CharField(max_length=10, verbose_name="Complemento", blank=True)
 

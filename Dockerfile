@@ -11,7 +11,7 @@ COPY --from=redis:7-alpine3.20 /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 
 WORKDIR /silfloresapp
 
-EXPOSE 8000
+EXPOSE 8080
 
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \

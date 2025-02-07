@@ -1,12 +1,16 @@
+import os
 import json
+import requests #type:ignore
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from users.models import CustomUser
 from .models import Cart, CartItem, Message
-from products.models import Product
+from products.models import Product, Photo
 from django.utils import timezone
+from .pagseguro_service import PagSeguroAPI
+from django.conf import settings
 # Create your views here.
 
 @login_required(login_url="/user/login")
@@ -99,3 +103,75 @@ def get_messages(request, username):
             'time': f'{message.datetime.hour}:{message.datetime.minute}'
         })
     return JsonResponse({'messages': messagesData, 'length': len(messagesData)})
+
+
+def process_payment(request, username):
+    if request.method == "POST":
+        cart = Cart.objects.get(user__username=username)
+        user = cart.user
+        cep = user.cep.replace("-", "")
+        address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
+        data = {
+            "customer": {
+                "phone": {
+                    "country": "+55",
+                    "area": str(user.ddd),
+                    "number": str(user.phone),
+                },
+                "Name": user.name,
+                "email": user.email,
+                "tax_id": user.cpf,
+            },
+            "shipping": {
+                "address": {
+                    "street": address["logradouro"],
+                    "number": str(user.home_number),
+                    "city": address["localidade"],
+                    "region_code": address["uf"],
+                    "country": "BRA",
+                    "postal_code": user.cep,
+                    "complement": user.complement,
+                    "locality": address["bairro"]
+                },
+                "box": {
+                    "dimensions": {
+                        "length": 16,
+                        "width": 11,
+                        "height": 3
+                    },
+                    "weight": 300
+                },
+                "type": "FIXED",
+                "address_modifiable": False,
+                "amount": 0 if settings.PAGSEGURO_SANDBOX else 0 #implementar melhor envio posteriormente, 0 para testes
+            },
+            "customer_modifiable": True,
+            "reference_id": cart.id,
+            "items": [],
+            "payment_methods": [{ "type": "CREDIT_CARD" }, { "type": "DEBIT_CARD" }, { "type": "BOLETO" }, { "type": "PIX" }],
+            "redirect_url": "https://pagseguro.uol.com.br"
+        }
+        for cartitem in cart.cartitem_set.all():
+            item = {}
+            item['reference_id'] = cartitem.product.id
+            item['name'] = cartitem.product.name
+            item['quantity'] = cartitem.quantity
+            item['unit_amount'] = int(cartitem.product.price * 100)
+            data['items'].append(item)
+        response = PagSeguroAPI.generate_payment(data)
+        for item in response['links']:
+            if item['rel'] == 'PAY':
+                print(item['href'])
+    return JsonResponse(data={}, status=500)
+
+
+def notification_handler(request):
+    if request.method == "POST":
+        notification_code = request.POST.get("notificationCode")
+        notification_type = request.POST.get("notificationType")
+
+        if notification_type == "transaction":
+            transaction_details = PagSeguroAPI.get_transaction_details(notification_code)
+            print(transaction_details)
+
+    return HttpResponse(status=200)

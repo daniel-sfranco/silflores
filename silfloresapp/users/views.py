@@ -15,7 +15,13 @@ def user_register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if(form.is_valid()):
-            user = form.save()
+            user = form.save(commit=False)
+            if(not user.phone.isnumeric()):
+                newPhone = []
+                for c in user.phone:
+                    if c.isnumeric:
+                        newPhone.append(c)
+                user.phone = "".join(newPhone)
             user.cart = Cart(user=user, status="open")
             user.cart.save()
             login(request, user)

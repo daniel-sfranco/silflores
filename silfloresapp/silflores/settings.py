@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import redis #type:ignore
+from django.core.management.commands.runserver import Command as RunserverCommand
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -170,3 +170,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'change-me')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'change-me')
+
+RunserverCommand.default_addr = '0.0.0.0'
+RunserverCommand.default_port = os.getenv('PORT', '8080')  # Usa a porta 8080 se a variável PORT estiver definida
