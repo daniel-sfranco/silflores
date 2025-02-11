@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import dj_database_url #type:ignore
 from pathlib import Path
-from django.core.management.commands.runserver import Command as RunserverCommand
+from django.core.management.commands.runserver import Command as RunserverCommand #type:ignore
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,14 +27,14 @@ DATA_DIR = os.path.join(BASE_DIR.parent, 'data', 'web')
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.getenv('DEBUG', 0)))
+DEBUG = bool(int(os.getenv('DEBUG', '1')))
 
 PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
 PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')
 PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
 
 ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()
+    h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
 ]
 
 
@@ -57,15 +57,17 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'silflores.routing.application'
 
-CHANNEL_LAYERS = {
+"""CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('0.0.0.0', 6379)],
             "hosts": [("redis", 6379)],
+            "hosts": [("redis-1", 6379)],
         },
     },
-}
+}"""
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,6 +78,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
 ROOT_URLCONF = 'silflores.urls'
 
@@ -102,15 +107,24 @@ WSGI_APPLICATION = 'silflores.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-if(DEBUG):
+if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': "django.db.backends.postgresql",
-            'NAME': os.getenv('POSTGRES_DB', 'change-me'),
-            'USER': os.getenv('POSTGRES_USER', 'change-me'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'change-me'),
-            'HOST': os.getenv('POSTGRES_HOST', 'change-me'),
-            'PORT': os.getenv('POSTGRES_PORT', 'change-me'),
+            'NAME': os.getenv('POSTGRES_DB', 'silfloresdb'),
+            'USER': os.getenv('POSTGRES_USER', 'silflores'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'silflores@2025'),
+            'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://localhost:6379',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            }
         }
     }
 else:
@@ -118,6 +132,15 @@ else:
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL')
         )
+    }
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
+        }
     }
 
 

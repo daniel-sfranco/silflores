@@ -1,0 +1,393 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    --back: white;
+    --title:#bf5b87;
+    --backnav: #f3e1e9;
+    --backmenu: #f3e1e97b;
+}
+
+input::-webkit-input-placeholder { /* Para navegadores WebKit (Chrome, Safari) */
+    color: var(--title);
+    opacity: .65;
+}
+input:-moz-placeholder { /* Para Firefox */
+    color: var(--title);
+    opacity: .65;
+}
+input::-moz-placeholder { /* Para Firefox 19+ */
+    color: var(--title);
+    opacity: .65;
+}
+input:-ms-input-placeholder { /* Para Internet Explorer 10+ */
+    color: var(--title);
+    opacity: .65;
+}
+input::placeholder { /* Para navegadores modernos */
+    color: var(--title);
+    opacity: .65;
+}
+
+body {
+    min-height: 100vh;
+    background-color: var(--back);
+    color: black;
+    font-size: 1rem;
+}
+
+nav {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--backnav);
+    font-size: 1rem;
+    display: flex;
+}
+
+#right-header {
+    margin-top: 0rem;
+    display: flex;
+    float: right;
+}
+
+#left-header {
+    width: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+}
+
+nav a {
+    margin: 0.5rem;
+}
+
+main {
+    padding: 2rem;
+    margin: 0;
+}
+
+p {
+    margin: 1rem 0 1rem 0;
+}
+
+h1{
+    color: var(--title);
+}
+
+a {
+    text-decoration: none;
+    color: var(--title);
+}
+
+a:hover {
+    opacity: .85;
+}
+
+section {
+    padding: 1rem;
+}
+
+
+.form {
+    font-size: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+    max-width: 600px;
+}
+
+.form > div, .form > p {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+}
+
+input {
+    padding: 0.25rem;
+    max-width: 300px;
+    outline: none;
+}
+
+.form select {
+    padding: 0.25rem;
+    max-width: 300px;
+}
+
+.form > .photo {
+    flex-flow: row;
+}
+
+.product_photo {
+    width: 15rem;
+    height: 15rem;
+    object-fit: contain;
+}
+
+.product_photo::hover {
+    opacity: .85;
+}
+
+.form-submit {
+    padding: 0.5rem;
+    border-radius: 10px;
+    width: 10rem;
+    border: none;
+    background-color: var(--backnav);
+    color:var(--title);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 2rem;
+    border: 1px solid #888;
+    border-radius: 20px;
+    width: 80%;
+}
+
+.modal-footer {
+    margin: 1rem 0 1rem 0;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.user_photo {
+    margin: 1rem;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 100%;
+}
+
+#logout {
+    display: inline-block;
+}
+
+#logout-button {
+    font-size: 1rem;
+    background-color: rgb(0, 0, 0, 0);
+    border: none;
+    margin: 0.5rem;
+    color: var(--title);
+    font-family: "liberation serif";
+}
+
+#sec_logo {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+
+.cart-product-table {
+    width: 100%;
+    border: 1px solid black;
+}
+
+#passRecover {
+    background-color: var(--back);
+    border: none;
+    width: 10rem;
+    text-align:left;
+    color: var(--title);
+}
+
+#passRecover:hover {
+    opacity: .85;
+}
+
+.tag_link {
+    color: var(--title);
+}
+
+.tag_link:hover {
+    opacity: .85
+}
+
+.dropdown {
+    position: relative;
+    display: block;
+    margin-left: 60%;
+    min-width: 40%;
+}
+
+.dropButton {
+    background-color: var(--title);
+    color: var(--back);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.dropdownContent{
+    display: none;
+    position: absolute;
+    width: 100%;
+    background-color: var(--backmenu);
+    z-index: 1;
+}
+
+.dropdownContent button {
+    width: 40%;
+    height: 2rem;
+    margin-left: 30%;
+    margin-bottom: 5%;
+    background-color: var(--title);
+    color: var(--back);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.showDropdown {
+    display:grid;
+}
+
+.dropdownContent input {
+    left: 0;
+}
+
+.dropdown label {
+    margin-left: 1rem;
+    padding: 2rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.dropdown span {
+    margin-left: 1rem;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #ddd;
+  }
+
+.dropdown input[type="checkbox"] {
+    width: 0;
+    height: 0;
+}
+
+.dropdown input:checked ~ .checkmark {
+    background-color: var(--title);
+}
+
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+#prices {
+    margin: 0.5rem;
+}
+
+#chat {
+    display: block;
+    width: 28%;
+    margin-left: 2%;
+    margin-top: 1.75rem;
+}
+
+#messages {
+    border: 1px solid black;
+    overflow: auto;
+    display: block;
+    height: 20rem;
+    margin-bottom: 0.5rem;
+}
+
+#mainCartPage {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#cartTable {
+    width: 70%;
+}
+
+#product-search {
+    margin: 0 1rem;
+    padding: 0.25rem;
+    border: none;
+    border-bottom: 1px solid var(--title);
+    background-color: var(--backnav);
+    flex-grow: 1;
+}
+
+#search-button {
+    font-size: 1rem;
+    background-color: var(--title);
+    border: none;
+    margin: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 1rem;
+    color: var(--backnav);
+    font-family: "liberation serif";
+}
+
+.quantityInput {
+    width: 4.5rem;
+    text-align: center;
+}
+
+.messageContent {
+    padding: 0.5rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.messageTime {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0;
+    margin: 0;
+    font-size: 0.7rem;
+    color: gray;
+}
+
+.dateP {
+    text-align: center;
+}
