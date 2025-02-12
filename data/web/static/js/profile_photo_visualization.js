@@ -19,7 +19,7 @@ imageInput.addEventListener('change', (event) => {
 
  function handleCheckboxChange(checkbox) {
     if(checkbox.checked){
-        previewImage.src = '/media/fallback_user.png';
+        previewImage.src = '/static/img/fallback_user.png';
     } else {
         previewImage.src = '{{ widget.value.url }}';
     }

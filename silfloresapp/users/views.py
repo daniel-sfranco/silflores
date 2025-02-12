@@ -1,12 +1,12 @@
-from django.contrib.auth import views as auth_views
-from django.shortcuts import render, redirect, HttpResponseRedirect
-from django.contrib.auth.forms import AuthenticationForm
-from django.urls import reverse
+from django.contrib.auth import views as auth_views #type:ignore
+from django.shortcuts import render, redirect, HttpResponseRedirect #type:ignore
+from django.contrib.auth.forms import AuthenticationForm #type:ignore
+from django.urls import reverse #type:ignore
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout #type:ignore
 from cart.models import Cart
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage #type:ignore
 
 # Create your views here.
 
@@ -22,6 +22,7 @@ def user_register(request):
                     if c.isnumeric:
                         newPhone.append(c)
                 user.phone = "".join(newPhone)
+            user.save()
             user.cart = Cart(user=user, status="open")
             user.cart.save()
             login(request, user)

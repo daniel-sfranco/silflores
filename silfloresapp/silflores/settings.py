@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 import dj_database_url #type:ignore
 from pathlib import Path
-from django.core.management.commands.runserver import Command as RunserverCommand #type:ignore
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,20 +57,18 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'silflores.routing.application'
 
-"""CHANNEL_LAYERS = {
+CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [('127.0.0.1', 6379)],
-            "hosts": [('0.0.0.0', 6379)],
-            "hosts": [("redis", 6379)],
-            "hosts": [("redis-1", 6379)],
+            "hosts": [('127.0.0.1', 6379),('0.0.0.0', 6379),("redis", 6379), ("fly-silflores-redis.upstash.io", 6379)],
         },
     },
-}"""
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,12 +117,8 @@ if DEBUG:
         }
     }
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': 'redis://localhost:6379',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
 else:
@@ -142,6 +136,17 @@ else:
             }
         }
     }
+
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
+    'https://silflores.fly.dev',
+    'https://silflores.com.br',
+    'https://www.silflores.com.br',
+]
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Password validation
@@ -170,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'America/Sao_Paulo'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -179,11 +184,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 STATIC_ROOT = os.path.join(DATA_DIR, 'static')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
@@ -201,6 +208,3 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'change-me')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'change-me')
-
-RunserverCommand.default_addr = '0.0.0.0'
-RunserverCommand.default_port = os.getenv('PORT', '8080')  # Usa a porta 8080 se a variável PORT estiver definida

@@ -1,5 +1,6 @@
 const finishButton = document.getElementById("finishPurchase");
-const cartUser = document.getElementById("data").getAttribute("data-user");
+const actUser = document.getElementById("data").getAttribute("data-user");
+const cartUser = document.getElementById("data").getAttribute("data-con");
 
 finishButton.onclick = function() {
     fetch(`/cart/${cartUser}/processPayment`, {

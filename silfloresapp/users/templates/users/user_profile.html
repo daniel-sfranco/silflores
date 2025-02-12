@@ -9,12 +9,15 @@ Seu perfil
 {% block content %}
     {% if user.username == profile.username %}
         <h1>Seu perfil</h1>
-        <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+        {% if profile.photo %}
+            <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
+        {% else %}
+            <img src="{% static "img/fallback_user.png" %}" alt="Fallback Photo">
+        {% endif %}
         <p>Nome Cadastrado: {{profile.name}}</p>
         {% else %}
         <h1>{{profile.name}}</h1>
-        <img src="{{profile.photo.url}}" alt="Profile Photo" class="user_photo"/>
-        {% endif %}
+    {% endif %}
     <p>Nome de Usuário: {{profile.username}}</p>
     <p>Email: {{profile.email}}</p>
     {% if user.username == profile.username %}

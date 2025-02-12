@@ -1,16 +1,15 @@
-import os
 import json
 import requests #type:ignore
-from django.http import HttpResponse, JsonResponse
-from django.urls import reverse
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponse, JsonResponse#type:ignore
+from django.urls import reverse#type:ignore
+from django.shortcuts import render, redirect#type:ignore
+from django.contrib.auth.decorators import login_required, user_passes_test#type:ignore
 from users.models import CustomUser
 from .models import Cart, CartItem, Message
 from products.models import Product, Photo
-from django.utils import timezone
+from django.utils import timezone#type:ignore
 from .pagseguro_service import PagSeguroAPI
-from django.conf import settings
+from django.conf import settings#type:ignore
 # Create your views here.
 
 @login_required(login_url="/user/login")

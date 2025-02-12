@@ -1,4 +1,3 @@
-const actUser = document.getElementById("data").getAttribute("data-user");
 const wsUrl = new URL(window.location.href);
 const ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
 const messageInput = document.getElementById("message-input");
