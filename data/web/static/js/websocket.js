@@ -1,6 +1,14 @@
 const wsUrl = new URL(window.location.href);
-const ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
+const debug = document.getElementById("data").getAttribute("data-debug");
+let ws = 0
+if(debug == "0"){
+    let ws = new WebSocket(`wss://${wsUrl.host}/ws/chat/${cartUser}-cart`);
+} else {
+    let ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
+}
 const messageInput = document.getElementById("message-input");
+
+console.log(debug)
 
 
 ws.onopen = () => {

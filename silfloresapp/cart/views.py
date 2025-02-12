@@ -18,7 +18,7 @@ def cart_page(request, username):
     items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
     cartUser = {'name': cart.user.name, 'username': cart.user.username}
     user = CustomUser.objects.get(username=request.user.username)
-    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': user, 'messages': Message.objects.filter(cart=cart).order_by("datetime")})
+    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': user, 'messages': Message.objects.filter(cart=cart).order_by("datetime"), 'debug':settings.DEBUG})
 
 
 @login_required(login_url='/user/login')

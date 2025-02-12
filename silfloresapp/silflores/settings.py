@@ -57,15 +57,6 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION = 'silflores.routing.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [('127.0.0.1', 6379),('0.0.0.0', 6379),("redis", 6379), ("fly-silflores-redis.upstash.io", 6379)],
-        },
-    },
-}
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -116,11 +107,14 @@ if DEBUG:
             'PORT': os.getenv('POSTGRES_PORT', '5432'),
         }
     }
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        }
-    }
+    CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 else:
     DATABASES = {
         'default': dj_database_url.config(
@@ -136,17 +130,24 @@ else:
             }
         }
     }
+    CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('redis://default:432c4aac83564bb08a597099aeeb1011@fly-silflores-redis.upstash.io:6379')],
+        },
+    },
+}
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = [
-    'https://silflores.fly.dev',
-    'https://silflores.com.br',
-    'https://www.silflores.com.br',
-]
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = [
+        'https://silflores.fly.dev',
+        'https://silflores.com.br',
+        'https://www.silflores.com.br',
+    ]
 
 
 # Password validation
@@ -168,7 +169,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
