@@ -17,7 +17,10 @@ class PagSeguroAPI:
             "Content-type": "application/json"
         }
         response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except:
+            print(response.json())
         return response.json()
 
     def get_transaction_details(transaction_code):

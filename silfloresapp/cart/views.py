@@ -1,6 +1,6 @@
 import json
 import requests #type:ignore
-from django.http import HttpResponse, JsonResponse#type:ignore
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect#type:ignore
 from django.urls import reverse#type:ignore
 from django.shortcuts import render, redirect#type:ignore
 from django.contrib.auth.decorators import login_required, user_passes_test#type:ignore
@@ -148,7 +148,7 @@ def process_payment(request, username):
             "reference_id": cart.id,
             "items": [],
             "payment_methods": [{ "type": "CREDIT_CARD" }, { "type": "DEBIT_CARD" }, { "type": "BOLETO" }, { "type": "PIX" }],
-            "redirect_url": "https://pagseguro.uol.com.br"
+            'redirect_url': 'https://silflores.com.br'
         }
         for cartitem in cart.cartitem_set.all():
             item = {}
@@ -161,6 +161,7 @@ def process_payment(request, username):
         for item in response['links']:
             if item['rel'] == 'PAY':
                 print(item['href'])
+                return JsonResponse(data={'payment_link':item['href']}, status=200)
     return JsonResponse(data={}, status=500)
 
 

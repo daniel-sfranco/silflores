@@ -13,8 +13,11 @@ from math import trunc
 
 
 def product_collections(request):
-    tags = Tag.objects.exclude(name='all').order_by('-lastChanged')
-    return render(request, 'products/product_collections.html', {'tags': tags})
+    tags = Tag.objects.order_by('-lastChanged')
+    if tags.count() > 1:
+        return render(request, 'products/product_collections.html', {'tags': tags, 'empty': False})
+    else:
+        return render(request, 'products/product_collections.html', {'tags': tags, 'empty': True})
 
 
 def products_list(request, tagName, searchTerm=None):

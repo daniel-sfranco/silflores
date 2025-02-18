@@ -1,11 +1,13 @@
 from django.db import models #type:ignore
 from django.contrib.auth.models import AbstractUser #type:ignore
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 
 class CustomUser(AbstractUser):
     name = models.CharField(max_length=200, verbose_name="Nome Completo", blank=True)
-    photo = models.ImageField(blank=True, verbose_name="Foto de perfil (opcional)", null=True)
+    #photo = models.ImageField(blank=True, verbose_name="Foto de perfil (opcional)", null=True)
+    photo = CloudinaryField('imagem')
     cpf = models.CharField(verbose_name="CPF (só números)", unique=True, blank=True)
     email = models.EmailField(verbose_name="Email", unique=True)
     phone = models.CharField(max_length=10, verbose_name="Telefone (só números)", blank=True)

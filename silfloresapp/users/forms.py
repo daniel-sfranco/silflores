@@ -16,13 +16,13 @@ class UserPhotoWidget(forms.ClearableFileInput):
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['name', 'cpf', 'email', 'phone', 'birthday', 'cep', 'home_number', 'complement', 'photo', 'username']
+        fields = ['name', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement', 'photo', 'username']
 
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
-        fields = ['photo', 'name', 'username', 'cpf', 'email', 'phone', 'birthday', 'cep', 'home_number', 'complement']
+        fields = ['photo', 'name', 'username', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement']
         widgets = {
             'photo': UserPhotoWidget(),
         }

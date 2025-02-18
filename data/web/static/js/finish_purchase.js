@@ -12,6 +12,6 @@ finishButton.onclick = function() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        window.location.href=data.payment_link
     })
 }
