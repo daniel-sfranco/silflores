@@ -29,10 +29,4 @@
     <input type="hidden" id="data" data-user="{{user.username}}">
     <button id='finishPurchase'>Finalizar compra</button>
     <script src="{% static 'js/finish_purchase.js' %}"></script>
-
-    {% for option in freight %}
-        {% if option.company.name == 'Correios' %}
-            <p>{{option}}</p>
-        {% endif %}
-    {% endfor %}
 {% endblock content %}
