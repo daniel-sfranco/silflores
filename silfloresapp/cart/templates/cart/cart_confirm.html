@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    Confirmar compra
+{% endblock title %}
+
+{% block content %}
+    <h1>Opções de frete</h1>
+    <table class="freight_confirm">
+        <tr>
+            <th></th>
+            <th>Opção</th>
+            <th>Preço</th>
+            <th>Tempo para entrega</th>
+        </tr>
+        {% for option in freight %}
+            {% if option.company.name == 'Correios' %}
+                <tr>
+                    <td><input type="radio" name="freight_options" value="{{option.name}}"></td>
+                    <td>{{option.name}}</td>
+                    <td id="{{option.name}}">{{option.currency}}{{option.price}}</td>
+                    <td>{{option.delivery_range.min}} a {{option.delivery_range.max}} dias úteis</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    <input type="hidden" id="data" data-user="{{user.username}}">
+    <button id='finishPurchase'>Finalizar compra</button>
+    <script src="{% static 'js/finish_purchase.js' %}"></script>
+
+    {% for option in freight %}
+        {% if option.company.name == 'Correios' %}
+            <p>{{option}}</p>
+        {% endif %}
+    {% endfor %}
+{% endblock content %}

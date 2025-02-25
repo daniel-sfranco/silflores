@@ -9,16 +9,21 @@ from .models import Cart, CartItem, Message
 from products.models import Product, Photo
 from django.utils import timezone#type:ignore
 from .pagseguro_service import PagSeguroAPI
+from .melhorenvio_service import MelhorEnvioAPI
 from django.conf import settings#type:ignore
-# Create your views here.
+
 
 @login_required(login_url="/user/login")
 def cart_page(request, username):
-    cart = Cart.objects.get(user__username=username)
-    items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
-    cartUser = {'name': cart.user.name, 'username': cart.user.username}
-    user = CustomUser.objects.get(username=request.user.username)
-    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': user, 'messages': Message.objects.filter(cart=cart).order_by("datetime"), 'debug':settings.DEBUG})
+    actUser = CustomUser.objects.get(username=request.user.username)
+    if(actUser.is_superuser or actUser.username == username):
+        cart = Cart.objects.get(user__username=username)
+        items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
+        cartUser = {'name': cart.user.name, 'username': cart.user.username}
+        messages = Message.objects.filter(cart=cart).order_by("datetime")
+        return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': actUser, 'messages': messages, 'debug':settings.DEBUG})
+    else:
+        return redirect(f'/cart/{request.user.username}/page')
 
 
 @login_required(login_url='/user/login')
@@ -49,6 +54,7 @@ def cart_add(request):
     return HttpResponse("Product correctly added to cart")
 
 
+@login_required(login_url='/user/login')
 def set_quantity(request):
     data = json.loads(request.body)
     pk = data['pk']
@@ -90,6 +96,7 @@ def cart_orders(request):
     return render(request, 'cart/cart_visualization.html', {'carts':carts, 'items':carts_items})
 
 
+@login_required(login_url='/user/login')
 def get_messages(request, username):
     cart = Cart.objects.get(user__username=username)
     messagesQuery = Message.objects.filter(cart=cart).order_by("datetime")
@@ -104,7 +111,35 @@ def get_messages(request, username):
     return JsonResponse({'messages': messagesData, 'length': len(messagesData)})
 
 
+@login_required(login_url='/user/login')
+def confirm_purchase(request, username):
+    user = CustomUser.objects.get(username=username)
+    if(user.username == username):
+        payload = {
+            "from": { "postal_code": f"{settings.FROM_CEP}" },
+            "to": { "postal_code": f"{user.cep}" },
+            "package": {
+                "height": 6,
+                "width": 16,
+                "length": 18,
+                "weight": 0.3
+            }
+        }
+        MelhorEnvioObject = MelhorEnvioAPI()
+        response = MelhorEnvioObject.freight_calc(payload=payload)
+        for option in response:
+            if 'error' in option.keys():
+                response.remove(option)
+        return render(request, 'cart/cart_confirm.html', {'freight': response})
+    else:
+        return redirect(f'/cart/{request.user.username}/page')
+
+
+@login_required(login_url='/user/login')
 def process_payment(request, username):
+    body = json.loads(request.body)
+    freightValue = float(body['freight_value'][2:])
+    freightOption = body['freight_option']
     if request.method == "POST":
         cart = Cart.objects.get(user__username=username)
         user = cart.user
@@ -142,7 +177,7 @@ def process_payment(request, username):
                 },
                 "type": "FIXED",
                 "address_modifiable": False,
-                "amount": 0 if settings.PAGSEGURO_SANDBOX else 0 #implementar melhor envio posteriormente, 0 para testes
+                "amount": freightValue * 100,
             },
             "customer_modifiable": True,
             "reference_id": cart.id,
@@ -160,11 +195,11 @@ def process_payment(request, username):
         response = PagSeguroAPI.generate_payment(data)
         for item in response['links']:
             if item['rel'] == 'PAY':
-                print(item['href'])
                 return JsonResponse(data={'payment_link':item['href']}, status=200)
     return JsonResponse(data={}, status=500)
 
 
+@login_required(login_url='/user/login')
 def notification_handler(request):
     if request.method == "POST":
         notification_code = request.POST.get("notificationCode")

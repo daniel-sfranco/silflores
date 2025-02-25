@@ -35,6 +35,12 @@ DEBUG = bool(int(os.getenv('DEBUG', '1')))
 PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
 PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')
 PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
+MELHOR_ENVIO_CLIENT_ID = os.getenv('MELHOR_ENVIO_CLIENT_ID')
+MELHOR_ENVIO_CLIENT_SECRET = os.getenv('MELHOR_ENVIO_CLIENT_SECRET')
+MELHOR_ENVIO_LINK = os.getenv('MELHOR_ENVIO_LINK')
+MELHOR_ENVIO_TOKEN = os.getenv('MELHOR_ENVIO_TOKEN')
+FROM_CEP=os.getenv('FROM_CEP', 'change-me')
+
 
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
@@ -50,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.postgres',
+    'cloudinary',
+    'cloudinary_storage',
     'daphne',
     'django.contrib.staticfiles',
     'channels',

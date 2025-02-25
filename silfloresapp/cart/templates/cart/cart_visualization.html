@@ -12,7 +12,7 @@
         <hr>
         <p>Nome: {{cart.user.name}}</p>
         <a href="{% url "profile" cart.user.username %}">Usuário: {{cart.user.username}}</a> <br>
-        <a href="{% url "cart:page" cart.user.username %}">Mais detalhes</a>
+        <button action="cartRedirect({{cart.user.username}})"></button>
         <table class="cart-product-table">
             <thead>
                 <td>Produto</td>

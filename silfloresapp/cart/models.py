@@ -32,3 +32,12 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.datetime.day}/{self.datetime.month}/{self.datetime.year % 100} {self.datetime.hour}:{self.datetime.minute} - {self.sender.username}: {self.content}"
+
+class Coupon(models.Model):
+    types = {
+        'fixed': 'fixo',
+        'variable': 'porcentagem',
+    }
+    name = models.CharField(max_length=20, verbose_name="Nome")
+    type = models.CharField(choices=types, verbose_name="Tipo")
+    value = models.DecimalField(decimal_places=2, max_digits=6)

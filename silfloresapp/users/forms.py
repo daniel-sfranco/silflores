@@ -1,31 +1,23 @@
 from django import forms
 from django.template.loader import render_to_string
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from cloudinary.forms import CloudinaryFileField
 from .models import CustomUser
-
-
-class UserPhotoWidget(forms.ClearableFileInput):
-    template_name = 'users/user_photo_widget.html'
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-        context['widget']['is_initial'] = self.is_initial(value)
-        return context
 
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['name', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement', 'photo', 'username']
+        fields = ['name', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement', 'username']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
-        fields = ['photo', 'name', 'username', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement']
-        widgets = {
-            'photo': UserPhotoWidget(),
-        }
+        fields = ['name', 'username', 'cpf', 'email', 'ddd', 'phone', 'birthday', 'cep', 'home_number', 'complement']
 
 
     def __init__(self, *args, **kwargs):

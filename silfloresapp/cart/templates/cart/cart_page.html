@@ -45,9 +45,9 @@
             <button id="send-message">Enviar</button>
         </div>
     </section>
-
-    <button id="finishPurchase">Finalizar compra</button>
-    <script src="{% static 'js/finish_purchase.js' %}"></script>
+    {% if cartUser.username == user.username %}
+       <a href="{% url "cart:confirm" user.username %}">Finalizar pedido</a>
+    {% endif %}
     <script src="{% static 'js/set_quantity.js' %}"></script>
     <script src="{% static "js/websocket.js" %}"></script>
 {% endblock content %}

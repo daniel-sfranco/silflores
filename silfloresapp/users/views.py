@@ -7,13 +7,14 @@ from .models import CustomUser
 from django.contrib.auth import login, logout #type:ignore
 from cart.models import Cart
 from django.core.mail import EmailMessage #type:ignore
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 def user_register(request):
     next_url = request.GET.get('next') or request.POST.get('next')
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if(form.is_valid()):
             user = form.save(commit=False)
             if(not user.phone.isnumeric()):
@@ -58,25 +59,23 @@ def user_logout(request):
         logout(request)
         return redirect('home')
 
-
+@login_required(login_url="/user/login")
 def user_update(request):
-    instance = CustomUser.objects.get(username=request.user.username)
     if request.method == "POST":
-        form = CustomUserChangeForm(data=request.POST, files = request.FILES, instance=instance)
+        form = CustomUserChangeForm(data=request.POST, files=request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            if 'photo-clear' in request.POST:
-                request.user.photo = CustomUser._meta.get_field('photo').get_default()
-                request.user.save()
             return redirect('home')
     else:
-        form = CustomUserChangeForm(instance=instance)
+        form = CustomUserChangeForm(instance=request.user)
     return render(request, 'users/user_update.html', {"form": form})
 
+@login_required(login_url="/user/login")
 def user_profile(request, username):
     user = CustomUser.objects.get(username=username)
     return render(request, 'users/user_profile.html', {'profile': user})
 
+@login_required(login_url="/user/login")
 def user_delete(request):
     user = CustomUser.objects.get(username = request.user.username)
     cart = user.cart
@@ -85,7 +84,6 @@ def user_delete(request):
     cart.delete()
     user.delete()
     return redirect('home')
-
 
 
 class PasswordResetView(auth_views.PasswordResetView):

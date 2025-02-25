@@ -26,7 +26,6 @@ def products_list(request, tagName, searchTerm=None):
     upperPrice = 10000
     if(searchTerm):
         searchWords = searchTerm.strip().lower().split()
-        print(searchWords)
     else:
         searchWords = False
 
@@ -35,7 +34,6 @@ def products_list(request, tagName, searchTerm=None):
         products = Product.objects.all()
         if data['selectedTags']:
             tags = [tag for tag in Tag.objects.filter(name__in=data['selectedTags'])]
-            print(tags)
             products = products.filter(tags__in=tags)
         if 'lowerPrice' in data.keys():
             lowerPrice = int(data['lowerPrice'])

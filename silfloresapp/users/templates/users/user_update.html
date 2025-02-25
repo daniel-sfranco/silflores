@@ -8,10 +8,9 @@ User Update
 
 {% block content %}
     <h1>User Update</h1>
-    <form class="form" action="/user/update/" method="post" enctype="multipart/form-data">
+    <form class="form" action="/user/update/" method="post">
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
         <button class="form-submit">Submit</button>
     </form>
-    <script src="{% static 'js/profile_photo_visualization.js' %}"></script>
 {% endblock content %}
