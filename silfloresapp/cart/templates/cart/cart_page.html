@@ -47,6 +47,13 @@
     </section>
     {% if cartUser.username == user.username %}
        <a href="{% url "cart:confirm" user.username %}">Finalizar pedido</a>
+    {% else %}
+        {% if cart.status == 'closed' %}
+            <p>Status: Aguardando pagamento</p>
+        {% elif cart.status == 'paid' %}
+            <p>Status: Pago</p>
+            <button>Gerar etiqueta</button>
+        {% endif %}
     {% endif %}
     <script src="{% static 'js/set_quantity.js' %}"></script>
     <script src="{% static "js/websocket.js" %}"></script>

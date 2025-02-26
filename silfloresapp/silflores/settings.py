@@ -46,6 +46,10 @@ ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://0c43-189-111-174-72.ngrok-free.app'
+]
+
 
 # Application definition
 

@@ -40,6 +40,7 @@
             </tfoot>
         </table>
         <p>Preço total: R${{cart.fullPrice}}</p>
+        <a href="{% url "cart:page" cart.user.username %}">Mais detalhes</a>
     {% endfor %}
     <hr>
 {% endblock content %}

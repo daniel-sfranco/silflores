@@ -88,6 +88,7 @@ def product_new(request, product_id=None):
             product.slug = check_slug(product.name)
             tags = tag_list(product_form.cleaned_data['tags'] + ', all')
             product.numPhotos = len(request.FILES.getlist('images'))
+            product.firstPhoto = request.FILES.getlist('images')[0]
             product.save()
             if photo_form.is_valid():
                 i = 1

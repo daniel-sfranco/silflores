@@ -19,6 +19,15 @@ def cart_page(request, username):
     if(actUser.is_superuser or actUser.username == username):
         cart = Cart.objects.get(user__username=username)
         items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
+        numProducts = 0
+        fullPrice = 0
+        for item in items:
+            numProducts += item.quantity
+            fullPrice += item.fullPrice
+        if(cart.fullPrice != fullPrice or cart.products != numProducts):
+            cart.fullPrice = fullPrice
+            cart.products = numProducts
+            cart.save()
         cartUser = {'name': cart.user.name, 'username': cart.user.username}
         messages = Message.objects.filter(cart=cart).order_by("datetime")
         return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': actUser, 'messages': messages, 'debug':settings.DEBUG})
@@ -142,6 +151,10 @@ def process_payment(request, username):
     freightOption = body['freight_option']
     if request.method == "POST":
         cart = Cart.objects.get(user__username=username)
+        cart.freightOption = freightOption
+        cart.freightValue = freightValue
+        cart.status = "closed"
+        cart.save()
         user = cart.user
         cep = user.cep.replace("-", "")
         address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
@@ -185,6 +198,10 @@ def process_payment(request, username):
             "payment_methods": [{ "type": "CREDIT_CARD" }, { "type": "DEBIT_CARD" }, { "type": "BOLETO" }, { "type": "PIX" }],
             'redirect_url': 'https://silflores.com.br'
         }
+        if settings.DEBUG:
+            data['redirect_url'] = 'https://0c43-189-111-174-72.ngrok-free.app/cart/thanks'
+        else:
+            data['redirect_url'] = "https://silflores.com.br/cart/thanks"
         for cartitem in cart.cartitem_set.all():
             item = {}
             item['reference_id'] = cartitem.product.id
@@ -210,3 +227,10 @@ def notification_handler(request):
             print(transaction_details)
 
     return HttpResponse(status=200)
+
+
+def thanks(request):
+    user = request.user
+    cart = user.cart
+    cart.status = "paid"
+    return render(request, 'cart/cart_thanks.html')

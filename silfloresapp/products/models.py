@@ -25,6 +25,8 @@ class Product(models.Model):
     tags = models.ManyToManyField(Tag)
     slug = models.SlugField(blank=True)
     numPhotos = models.IntegerField(default=0)
+    numSold = models.IntegerField(default=0)
+    firstPhoto = CloudinaryField('imagem', null=True, blank=True)
 
     def __str__(self) -> str:
         return str(self.name)
@@ -32,7 +34,6 @@ class Product(models.Model):
 
 class Photo(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='photos', default=None)
-    #photo = models.FileField(upload_to="products/", blank=True)
     photo = CloudinaryField('imagem')
     label = models.CharField(max_length=155, blank=True)
 
