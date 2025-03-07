@@ -30,7 +30,6 @@
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                     <a href="/admin">Admin</a>
-                    <a href="{% url 'products:new' %}">Novo Produto</a>
                 {% endif %}
             {% endif %}
             <input type="text" id="product-search" placeholder="Pesquisar um produto">

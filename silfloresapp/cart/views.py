@@ -1,38 +1,41 @@
 import json
-import requests #type:ignore
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect#type:ignore
-from django.urls import reverse#type:ignore
-from django.shortcuts import render, redirect#type:ignore
-from django.contrib.auth.decorators import login_required, user_passes_test#type:ignore
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 from users.models import CustomUser
 from .models import Cart, CartItem, Message
-from products.models import Product, Photo
-from django.utils import timezone#type:ignore
+from products.models import Product
+from django.utils import timezone
 from .pagseguro_service import PagSeguroAPI
 from .melhorenvio_service import MelhorEnvioAPI
-from django.conf import settings#type:ignore
+from django.conf import settings
 
 
 @login_required(login_url="/user/login")
 def cart_page(request, username):
     actUser = CustomUser.objects.get(username=request.user.username)
-    if(actUser.is_superuser or actUser.username == username):
-        cart = Cart.objects.get(user__username=username)
-        items = [cartitem for cartitem in cart.cartitem_set.order_by('-product__name')]
-        numProducts = 0
-        fullPrice = 0
-        for item in items:
-            numProducts += item.quantity
-            fullPrice += item.fullPrice
-        if(cart.fullPrice != fullPrice or cart.products != numProducts):
-            cart.fullPrice = fullPrice
-            cart.products = numProducts
-            cart.save()
-        cartUser = {'name': cart.user.name, 'username': cart.user.username}
-        messages = Message.objects.filter(cart=cart).order_by("datetime")
-        return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': actUser, 'messages': messages, 'debug':settings.DEBUG})
-    else:
+    if(not actUser.is_superuser and actUser.username != username):
         return redirect(f'/cart/{request.user.username}/page')
+    cart = Cart.objects.get(user__username=username)
+    items = [cartitem for cartitem in cart.items.order_by('-product__name')]
+    numProducts = 0
+    fullPrice = 0
+    for item in items:
+        numProducts += item.quantity
+        fullPrice += item.fullPrice
+    if(cart.fullPrice != fullPrice or cart.products != numProducts):
+        cart.fullPrice = fullPrice
+        cart.products = numProducts
+        cart.save()
+    if(cart.checkoutCreation):
+        diff = timezone.now() - cart.checkoutCreation
+        if(cart.status == 'closed' and (diff.days > 0 or diff.seconds // 3600 >= 2)):
+            cart.status = 'open'
+            cart.save()
+    cartUser = {'name': cart.user.name, 'username': cart.user.username}
+    messages = Message.objects.filter(cart=cart).order_by("datetime")
+    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': actUser, 'messages': messages, 'debug':settings.DEBUG})
 
 
 @login_required(login_url='/user/login')
@@ -101,7 +104,7 @@ def cart_orders(request):
     carts = Cart.objects.exclude(products=0).exclude(user__in=superusers)
     carts_items = {}
     for cart in carts:
-        carts_items[cart.id] = cart.cartitem_set.order_by("-datetime")
+        carts_items[cart.id] = cart.items.order_by("-datetime")
     return render(request, 'cart/cart_visualization.html', {'carts':carts, 'items':carts_items})
 
 
@@ -124,18 +127,8 @@ def get_messages(request, username):
 def confirm_purchase(request, username):
     user = CustomUser.objects.get(username=username)
     if(user.username == username):
-        payload = {
-            "from": { "postal_code": f"{settings.FROM_CEP}" },
-            "to": { "postal_code": f"{user.cep}" },
-            "package": {
-                "height": 6,
-                "width": 16,
-                "length": 18,
-                "weight": 0.3
-            }
-        }
         MelhorEnvioObject = MelhorEnvioAPI()
-        response = MelhorEnvioObject.freight_calc(payload=payload)
+        response = MelhorEnvioObject.calculate_shipping(user=user)
         for option in response:
             if 'error' in option.keys():
                 response.remove(option)
@@ -153,66 +146,13 @@ def process_payment(request, username):
         cart = Cart.objects.get(user__username=username)
         cart.freightOption = freightOption
         cart.freightValue = freightValue
-        cart.status = "closed"
-        cart.save()
-        user = cart.user
-        cep = user.cep.replace("-", "")
-        address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
-        data = {
-            "customer": {
-                "phone": {
-                    "country": "+55",
-                    "area": str(user.ddd),
-                    "number": str(user.phone),
-                },
-                "Name": user.name,
-                "email": user.email,
-                "tax_id": user.cpf,
-            },
-            "shipping": {
-                "address": {
-                    "street": address["logradouro"],
-                    "number": str(user.home_number),
-                    "city": address["localidade"],
-                    "region_code": address["uf"],
-                    "country": "BRA",
-                    "postal_code": user.cep,
-                    "complement": user.complement,
-                    "locality": address["bairro"]
-                },
-                "box": {
-                    "dimensions": {
-                        "length": 16,
-                        "width": 11,
-                        "height": 3
-                    },
-                    "weight": 300
-                },
-                "type": "FIXED",
-                "address_modifiable": False,
-                "amount": freightValue * 100,
-            },
-            "customer_modifiable": True,
-            "reference_id": cart.id,
-            "items": [],
-            "payment_methods": [{ "type": "CREDIT_CARD" }, { "type": "DEBIT_CARD" }, { "type": "BOLETO" }, { "type": "PIX" }],
-            'redirect_url': 'https://silflores.com.br'
-        }
-        if settings.DEBUG:
-            data['redirect_url'] = 'https://0c43-189-111-174-72.ngrok-free.app/cart/thanks'
-        else:
-            data['redirect_url'] = "https://silflores.com.br/cart/thanks"
-        for cartitem in cart.cartitem_set.all():
-            item = {}
-            item['reference_id'] = cartitem.product.id
-            item['name'] = cartitem.product.name
-            item['quantity'] = cartitem.quantity
-            item['unit_amount'] = int(cartitem.product.price * 100)
-            data['items'].append(item)
-        response = PagSeguroAPI.generate_payment(data)
+        response = PagSeguroAPI.generate_payment(cart)
         for item in response['links']:
             if item['rel'] == 'PAY':
-                return JsonResponse(data={'payment_link':item['href']}, status=200)
+                cart.paymentUrl = item['href']
+                cart.checkoutCreation = timezone.now()
+                cart.save()
+                return JsonResponse(data={'payment_link':cart.paymentUrl}, status=200)
     return JsonResponse(data={}, status=500)
 
 
@@ -229,8 +169,20 @@ def notification_handler(request):
     return HttpResponse(status=200)
 
 
+@login_required(login_url="/user/login")
 def thanks(request):
     user = request.user
     cart = user.cart
     cart.status = "paid"
+    cart.paymentDatetime = timezone.now()
+    cart.save()
     return render(request, 'cart/cart_thanks.html')
+
+
+def getTicket(request, username):
+    user = CustomUser.objects.get(username=username)
+    MelhorEnvioObject = MelhorEnvioAPI()
+    insertResponse = MelhorEnvioObject.add_to_cart(user)
+    generateResponse = MelhorEnvioObject.generate_labels(user, insertResponse)
+    user.cart.status = "ticket"
+    user.cart.save()

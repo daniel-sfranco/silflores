@@ -46,7 +46,15 @@
         </div>
     </section>
     {% if cartUser.username == user.username %}
-       <a href="{% url "cart:confirm" user.username %}">Finalizar pedido</a>
+        {% if cart.status == 'open' %}
+            <a href="{% url "cart:confirm" user.username %}">Fechar pedido</a>
+        {% elif cart.status == 'closed' %}
+            <a href="{{cart.paymentUrl}}">Finalizar pagamento</a>
+        {% elif cart.status == 'paid' %}
+            <p>Pagamento feito em {{cart.paymentDatetime}}. Seu pedido será enviado em breve.</p>
+        {% elif cart.status == 'sent' %}
+            <a href="{{cart.trackingUrl}}">Verifique o rastreio do seu pedido aqui</a>
+        {% endif %}
     {% else %}
         {% if cart.status == 'closed' %}
             <p>Status: Aguardando pagamento</p>

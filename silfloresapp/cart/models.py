@@ -11,6 +11,11 @@ class Cart(models.Model):
     status = models.CharField(default="open")
     freightOption = models.CharField(default="")
     freightValue = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+    paymentUrl = models.CharField(default='')
+    trackingUrl = models.CharField(default='')
+    checkoutCreation = models.DateTimeField(null=True)
+    paymentDatetime = models.DateTimeField(null=True)
+    shipmentId = models.CharField(null=True)
 
     def __str__(self):
         return f"{self.user.username}'s cart"
@@ -18,7 +23,7 @@ class Cart(models.Model):
 class CartItem(models.Model):
     itemName = models.SlugField(blank=True)
     datetime = models.DateTimeField(auto_now_add=True)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     fullPrice = models.DecimalField(default=0, decimal_places=2, max_digits=6)

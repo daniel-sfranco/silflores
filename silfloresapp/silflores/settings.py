@@ -39,15 +39,17 @@ MELHOR_ENVIO_CLIENT_ID = os.getenv('MELHOR_ENVIO_CLIENT_ID')
 MELHOR_ENVIO_CLIENT_SECRET = os.getenv('MELHOR_ENVIO_CLIENT_SECRET')
 MELHOR_ENVIO_LINK = os.getenv('MELHOR_ENVIO_LINK')
 MELHOR_ENVIO_TOKEN = os.getenv('MELHOR_ENVIO_TOKEN')
-FROM_CEP=os.getenv('FROM_CEP', 'change-me')
+ADMIN_CEP=os.getenv('ADMIN_CEP', 'change-me')
 
 
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
 ]
 
+NGROK_URL = os.getenv('NGROK_URL', 'change-me')
+
 CSRF_TRUSTED_ORIGINS = [
-    'https://0c43-189-111-174-72.ngrok-free.app'
+    'https://*.ngrok-free.app' 
 ]
 
 
@@ -190,7 +192,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

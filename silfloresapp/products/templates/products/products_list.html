@@ -44,7 +44,15 @@
                 </label>
                 <button onclick="filter()">Filtrar</button>
             </div>
-          </div>
+        </div>
+        {% if user.is_authenticated and user.is_superuser %}
+            <button id="newProduct">Novo produto</button>
+            <script>
+                document.getElementById("newProduct").onclick = function(){
+                    window.location.href = "/products/new-product/"
+                }
+            </script>
+        {% endif %}
         <ul id="products_avaliable">
         {% for product in products %}
             <article>
@@ -54,5 +62,6 @@
         {% endfor %}
         </ul>
     </section>
+
     <script src="{% static "js/products_list.js" %}"></script>
 {% endblock%}
