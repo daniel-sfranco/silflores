@@ -11,6 +11,7 @@ urlpatterns = [
     path('products/', include('products.urls')),
     path('user/', include('users.urls')),
     path('cart/', include('cart.urls')),
+    path('getSoldProducts/', views.getSoldProducts, name="getSoldProducts"),
     path('meme', views.meme, name='meme'),
 ]
 

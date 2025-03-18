@@ -1,0 +1,24 @@
+const finishButton = document.getElementById("finishPurchase");
+const user = document.getElementById("data").getAttribute("data-user");
+
+finishButton.onclick = function() {
+    const freightOption = document.querySelector('input[name="freight_options"]:checked')
+    const freightValue = document.getElementById(freightOption.value)
+    console.log(freightOption.value)
+    console.log(freightValue.innerText)
+    fetch(`/cart/${user}/processPayment`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            'freight_option': freightOption.value,
+            'freight_value': freightValue.innerText
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        window.location.href=data.payment_link
+    })
+}

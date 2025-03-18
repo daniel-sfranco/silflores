@@ -179,10 +179,17 @@ def thanks(request):
     return render(request, 'cart/cart_thanks.html')
 
 
-def getTicket(request, username):
+def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
     MelhorEnvioObject = MelhorEnvioAPI()
     insertResponse = MelhorEnvioObject.add_to_cart(user)
-    generateResponse = MelhorEnvioObject.generate_labels(user, insertResponse)
+    buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
+    generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
     user.cart.status = "ticket"
+    user.cart.shipmentId = insertResponse['id']
     user.cart.save()
+    for item in user.cart.items:
+        product = item.product
+        product.numSold += item.quantity
+        product.save()
+    return JsonResponse(data=generateResponse)

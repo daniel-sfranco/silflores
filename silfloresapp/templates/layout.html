@@ -10,6 +10,7 @@
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <script src="https://kit.fontawesome.com/5a20b600e8.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     {% csrf_token %}
     {% block static %}{% endblock %}
@@ -20,38 +21,47 @@
     </title>
 </head>
 <body>
-    <nav>
-        <div id="left-header">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid navbar-container">
             <img src="{% static 'img/secondary_logo.png' %}" alt="" id='sec_logo'>
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'about' %}">Sobre nós</a>
-            <a href="{% url 'products:collections' %}">Coleções</a>
-            <a href="{% url "products:list" 'all' %}">Produtos</a>
-            {% if user.is_authenticated %}
-                {% if user.is_superuser %}
-                    <a href="/admin">Admin</a>
-                {% endif %}
-            {% endif %}
-            <input type="text" id="product-search" placeholder="Pesquisar um produto">
-            <button id="search-button" onclick="search()">Pesquisar</button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
         </div>
 
-        <div id="right-header">
-            {% if user.is_authenticated %}
-                {% if user.is_superuser %}
-                    <a href="{% url "cart:orders" %}">Pedidos</a>
-                {% else %}
-                    <a href="{% url "cart:page" user.username %}">Carrinho</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a href="{% url 'about' %}">Sobre</a></li>
+                <li class="nav-item"><a href="{% url 'products:collections' %}">Coleções</a></li>
+                <li class="nav-item"><a href="{% url "products:list" 'all' %}">Produtos</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <li class='nav-item'><a href="/admin">Admin</a></li>
+                    {% endif %}
                 {% endif %}
+            </ul>
+            <input type="text" id="product-search" placeholder="Pesquisar um produto">
+            <button id="search-button" onclick="search()">Pesquisar</button>
 
-                <a href="{% url "profile" user.username %}">Perfil</a>
-                <form id='logout' action = "{% url 'logout' %}" method="POST">
-                    {% csrf_token %}
-                    <button id='logout-button'>Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-            {% endif %}
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <li class="nav-item"><a href="{% url "cart:orders" %}">Pedidos</a></li>
+                    {% else %}
+                        <li class="nav-item"><a href="{% url "cart:page" user.username %}">Carrinho</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a href="{% url "profile" user.username %}">Perfil</a></li>
+                    <li class="nav-item">
+                        <form id='logout' action = "{% url 'logout' %}" method="POST">
+                            {% csrf_token %}
+                            <button id='logout-button'>Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
         </div>
     </nav>
     <main>
@@ -59,5 +69,6 @@
         {% block content %}
         {% endblock %}
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

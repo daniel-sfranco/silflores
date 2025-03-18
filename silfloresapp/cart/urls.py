@@ -13,5 +13,6 @@ urlpatterns = [
     path('<str:username>/processPayment', views.process_payment, name='processPayment'),
     path("pagseguro/notification/", views.notification_handler, name="pagseguro_notification"),
     path('<str:username>/confirm/', views.confirm_purchase, name='confirm'),
-    path('thanks', views.thanks, name='thanks')
+    path('thanks', views.thanks, name='thanks'),
+    path('<str:username>/getTicket', views.get_ticket, name='getTicket'),
 ]

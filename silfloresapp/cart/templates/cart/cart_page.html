@@ -60,7 +60,9 @@
             <p>Status: Aguardando pagamento</p>
         {% elif cart.status == 'paid' %}
             <p>Status: Pago</p>
-            <button>Gerar etiqueta</button>
+            <select name="boxSize" id="boxSize"></select>
+            <button id="generateTicket" data-user={{cartUser.username}}>Gerar etiqueta</button>
+            <script src="{% static "js/generate_ticket.js" %}"></script>
         {% endif %}
     {% endif %}
     <script src="{% static 'js/set_quantity.js' %}"></script>
