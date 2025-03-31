@@ -4,6 +4,7 @@ const allCheckbox = document.getElementById('tag-all');
 const lowerPrice = document.getElementById('lowerPrice');
 const upperPrice = document.getElementById('upperPrice');
 const stockAvaliable = document.getElementById("stockAvaliable");
+const productCards = Array.from(document.getElementsByClassName("card"));
 let tagCheckboxes = document.getElementsByClassName("checkbox-input");
 let tagLabels = document.getElementsByClassName("tag-checkbox");
 let numChecked = tagCheckboxes.length;
@@ -131,3 +132,17 @@ function filter() {
     })
     .catch(error => console.error('Erro ao carregar dados:', error));
 }
+
+productCards.forEach((card) => {
+    card.addEventListener('click', function() {
+        window.location.href = card.querySelector('a').href;
+    })
+
+    card.addEventListener('mouseover', function() {
+        card.style.cursor = 'pointer';
+    }
+    )
+    card.addEventListener('mouseout', function() {
+        card.style.cursor = 'auto';
+    })
+})
