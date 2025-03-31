@@ -14,10 +14,15 @@ from math import trunc
 
 def product_collections(request):
     tags = Tag.objects.order_by('-lastChanged')
-    if tags.count() > 1:
-        return render(request, 'products/product_collections.html', {'tags': tags, 'empty': False})
-    else:
-        return render(request, 'products/product_collections.html', {'tags': tags, 'empty': True})
+    tagList = []
+    for tag in tags:
+        if(tag.name == 'all'):
+            continue
+        products = Product.objects.filter(tags=tag)
+        mostSold = products.order_by('-numSold')[0]
+        tagList.append({'name': tag.name, 'numProducts': products.count(), 'photo': mostSold.firstPhoto.url, 'lastChanged': tag.lastChanged})
+    print(tagList)
+    return render(request, 'products/product_collections.html', {'tags': tagList, 'empty': len(tagList) > 0})
 
 
 def products_list(request, tagName, searchTerm=None):
@@ -50,7 +55,7 @@ def products_list(request, tagName, searchTerm=None):
                     products.remove(product)
         product_list = []
         for product in products:
-            json_formatted = {'name': product.name, 'price': product.price, 'slug': product.slug}
+            json_formatted = {'name': product.name, 'price': product.price, 'slug': product.slug, 'photoUrl': product.firstPhoto.url, 'desc': product.desc}
             if json_formatted not in product_list:
                 product_list.append(json_formatted)
         return JsonResponse({"products": product_list})
@@ -62,7 +67,8 @@ def products_list(request, tagName, searchTerm=None):
             for product in products:
                 if(count_matching_words(searchWords, product.slug) == 0):
                     products.remove(product)
-        return render(request, 'products/products_list.html', {'products': products, 'all': Tag.objects.get(name='all'), 'tags': Tag.objects.exclude(name='all').order_by('name'), 'actual': tagName})
+        productList = [{'photoUrl': product.firstPhoto.url, 'name': product.name, 'desc': product.desc, 'slug': product.slug} for product in products]
+        return render(request, 'products/products_list.html', {'products': json.dumps(productList), 'productsQuery': products, 'all': Tag.objects.get(name='all'), 'tags': Tag.objects.exclude(name='all').order_by('name'), 'actual': tagName})
 
 
 def product_page(request, slug):

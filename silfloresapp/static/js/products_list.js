@@ -95,10 +95,11 @@ function filter() {
             allCheckbox.checked = false;
         }
     }
+    let link = window.location.href;
     if(tags.length == 0){
         tags = ['all']
     }
-    fetch(window.location.href, {
+    fetch(link, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
@@ -118,11 +119,27 @@ function filter() {
         if(data.products.length > 0){
             data.products.forEach(product => {
                 const listItem = document.createElement("article");
+                listItem.setAttribute("class", "card col-lg-3 col-md-4 col-sm-4 col-6");
                 listItem.innerHTML = `
-                <a href="/products/${product.slug}">${product.name}</a>
-                <p>R$${product.price}</p>
+                    <img src="${product.photoUrl}" class="card-img-top" alt="${product.name} image">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">${product.desc}</p>
+                    </div>
+                    <a href="/products/${product.slug}" style="display: none;"></a>
                 `;
                 productList.appendChild(listItem);
+                listItem.addEventListener('click', function() {
+                    window.location.href = listItem.querySelector('a').href;
+                })
+
+                listItem.addEventListener('mouseover', function() {
+                    listItem.style.cursor = 'pointer';
+                }
+                )
+                listItem.addEventListener('mouseout', function() {
+                    listItem.style.cursor = 'auto';
+                })
             });
         } else {
             const notFound = document.createElement("p");

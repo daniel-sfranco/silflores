@@ -54,14 +54,14 @@
             </script>
         {% endif %}
         <ul id="products_avaliable" class="card-grid col-12">
-        {% for product in products %}
+        {% for product in productsQuery %}
             <article class="card col-lg-3 col-md-4 col-sm-4 col-6">
                 <img src="{{product.firstPhoto.url}}" class="card-img-top" alt="{{product.name}} image">
                 <div class="card-body">
                     <h5 class="card-title">{{product.name}}</h5>
                     <p class="card-text">{{product.desc}}</p>
                 </div>
-                <a href="{% url "products:page" product.slug %}" style="display: none;"></a>
+                <a href="/products/{{product.slug}}" style="display: none;"></a>
             </article>
         {% endfor %}
         </ul>

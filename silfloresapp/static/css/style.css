@@ -72,6 +72,7 @@ main {
 
 p {
     padding: 1rem 0 1rem 0;
+    margin: 0;
 }
 
 h1{
@@ -141,8 +142,16 @@ td {
     border: none;
 }
 
+.card > h5 {
+    padding: 0.5rem;
+}
+
+.card > p {
+    padding: 0.5rem;
+}
+
 .carousel-inner {
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .card-grid {

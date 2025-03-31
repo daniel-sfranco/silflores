@@ -7,14 +7,32 @@ Coleções
 {% block content %}
 <section>
     <h1>Coleções</h1>
-    {% if not empty %}
+    <div id="collections" class="d-flex flex-wrap">
         {% for tag in tags %}
-            {% if tag.numProducts > 0 and tag.name != 'all' %}
-                <a href="{% url "products:list" tag.name %}">{{tag.name}}</a>
-                <p>Número de produtos: {{tag.numProducts}}</p>
-                <p>Última atualização: {{tag.lastChanged}}</p>
+            {% if tag.numProducts > 0 %}
+                <article class="card col-lg-3 col-md-4 col-sm-6 col-12">
+                    <a href="{% url "products:list" tag.name %}" style="display: none;"></a>
+                    <img src="{{tag.photo}}" alt="{{tag.name}} image">
+                    <h5>{{tag.name}}</h5>
+                    <p>{{tag.numProducts}} produtos</p>
+                </article>
             {% endif %}
         {% endfor %}
-    {% endif %}
+    </div>
 </section>
+
+<script>
+    const productCards = Array.from(document.getElementsByClassName("card"));
+    productCards.forEach((card) => {
+        card.addEventListener('click', function() {
+            window.location.href = card.querySelector('a').href;
+        })
+        card.addEventListener('mouseover', function() {
+            card.style.cursor = 'pointer';
+        })
+        card.addEventListener('mouseout', function() {
+            card.style.cursor = 'auto';
+        })
+    })
+</script>
 {% endblock content %}
