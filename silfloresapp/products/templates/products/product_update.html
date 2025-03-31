@@ -7,29 +7,44 @@ Atualizar Produto
 {% endblock %}
 
 {% block content %}
-<h1>Atualizar produto</h1>
-<form class="form" action="{% url 'products:update' slug=product.slug %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="photo">
-        {% for image in product.photos.all %}
-            <img src="{{image.photo.url}}" alt="{{image.label}}" class="product_photo" data-delete-url="{% url 'products:delete_photo' image.id %}"/>
-        {% endfor %}
-    </div>
-    {{ photo_form }}
-
-    <div id="modalDeletePhoto" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Tem certeza que deseja excluir essa foto?</p>
-            <div class="modal-footer">
-                <button id="photoCancel" class="form-submit">Cancelar</button>
-                <button id="photoConfirm" class="form-submit">Excluir</button>
+    {% if user.is_authenticated %}
+        <input type="hidden" name="auth" id="auth" data-auth="True" data-user={{user.username}}>
+    {% else %}
+        <input type="hidden" name="auth" id="auth" data-auth="False">
+    {% endif %}
+    <p style="display:none;" data-size={{product.size}} data-slug={{product.slug}} data-auth={{user.is_authenticated}} data-page="update" id="data"></p>
+    <h1>Atualizar produto</h1>
+    <form class="form" action="{% url 'products:update' slug=product.slug %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="carousel my-5">
+            <div id="carouselExampleControls" class="carousel slide" data-rs-ride="carousel">
+                <div class="carousel-inner" id="photo-carousel"></div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev" id="prev-photo-button">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next" id="next-photo-button">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
             </div>
         </div>
-    </div>
+        {{ photo_form }}
 
-    {{ product_form.as_p }}
-    <button class="form-submit">Atualizar</button>
-</form>
-<script src="{% static 'js/product_photo_visualization.js' %}"></script>
+        <div id="photoModalDelete" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p>Tem certeza que deseja excluir essa foto?</p>
+                <div class="modal-footer">
+                    <button id="photoCancel">Cancelar</button>
+                    <button id="photoConfirm">Excluir</button>
+                </div>
+            </div>
+        </div>
+
+        {{ product_form.as_p }}
+        <button class="form-submit">Atualizar</button>
+    </form>
+    <script src="{% static 'js/product_photo_carousel.js' %}"></script>
+    <script src="{% static 'js/product_photo_visualization.js' %}"></script>
 {% endblock content %}

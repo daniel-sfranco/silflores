@@ -70,6 +70,14 @@ def product_page(request, slug):
     return render(request, 'products/product_page.html', {'product': product})
 
 
+def get_products_json(request, slug):
+    product = Product.objects.get(slug=slug)
+    photos = [{'label': photo.label, 'photoUrl': photo.photo.url} for photo in product.photos.all()]
+    product.numPhotos = len(photos)
+    product.save()
+    return JsonResponse({'photos': photos, 'numPhotos': len(photos)})
+
+
 @login_required(login_url="/user/login/")
 @user_passes_test(lambda u: u.is_superuser)
 def product_new(request, product_id=None):
@@ -120,7 +128,7 @@ def product_delete(request, slug):
         tag.numProducts -= 1
         tag.save()
     product.delete()
-    return redirect('/products/')
+    return JsonResponse({"success": True})
 
 
 @login_required(login_url='/user/login')
@@ -165,10 +173,16 @@ def product_update(request, slug):
 
 @login_required(login_url='/user/login')
 @user_passes_test(lambda u: u.is_superuser)
-def photo_delete(request, pk):
-    photo = Photo.objects.get(id=pk)
-    product = photo.product
-    photo.delete()
-    product.numPhotos -= 1
-    product.save()
-    return redirect(f'/products/{product.slug}/update')
+def photo_delete(request, label):
+    if request.method == "DELETE":
+        try:
+            photo = Photo.objects.get(label=label)
+            product = photo.product
+            photo.delete()
+            product.numPhotos -= 1
+            product.save()
+            return JsonResponse({'success': True})
+        except Photo.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Photo not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)

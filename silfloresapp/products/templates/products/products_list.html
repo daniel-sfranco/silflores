@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% block content%}
-    <section>
-        <h1>Produtos</h1>
+    <section style="padding: 1rem 0;">
+        <h1 style="margin: 0.5rem;">Produtos</h1>
         <div class="dropdown">
             <button class="dropButton">Filtros</button>
             <div id="myDropdown" class="dropdownContent">
-                <h4>Tags</h4>
+                <h4 style="margin: 0.5rem;">Tags</h4>
                 <label for="all" class='tag-checkbox'>
                     {% if actual == 'all' %}
                         <input type="checkbox" name='all' id='tag-all' class='checkbox-input' checked>
@@ -53,11 +53,14 @@
                 }
             </script>
         {% endif %}
-        <ul id="products_avaliable">
+        <ul id="products_avaliable" class="card-grid col-12">
         {% for product in products %}
-            <article>
-                <a href="{% url "products:page" product.slug %}">{{product.name}}</a>
-                <p>R${{product.price}}</p>
+            <article class="card col-lg-3 col-md-4 col-sm-4 col-6">
+                <img src="{{product.firstPhoto.url}}" class="card-img-top" alt="{{product.name}} image">
+                <div class="card-body">
+                    <h5 class="card-title">{{product.name}}</h5>
+                    <p class="card-text">{{product.desc}}</p>
+                </div>
             </article>
         {% endfor %}
         </ul>

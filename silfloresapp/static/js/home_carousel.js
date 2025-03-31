@@ -52,22 +52,26 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
         }
         innerCarousel.appendChild(actRow);
     }
+    if(numElements <= elementsPerRow){
+        const prev = document.getElementById('prev-photo-button')
+        const next = document.getElementById('next-photo-button')
+        prev.setAttribute("style", "display: none")
+        next.setAttribute("style", "display: none")
+    }
 }
 
 let soldProducts = 0;
 let numSoldProducts = 0;
 fetch("/getSoldProducts/")
-    .then((response) => response.json())
-    .then((data) => {
-        soldProducts = JSON.parse(data.soldProducts);
-        numSoldProducts = data.numSoldProducts;
-        setCarousel(
-            soldProducts,
-            numSoldProducts,
-            "sold-carousel",
-            "/products/",
-            false
-        );
-    });
-
-const cards = document.getElementsByClassName("card");
+.then((response) => response.json())
+.then((data) => {
+    soldProducts = JSON.parse(data.soldProducts);
+    numSoldProducts = data.numSoldProducts;
+    setCarousel(
+        soldProducts,
+        numSoldProducts,
+        "sold-carousel",
+        "/products/",
+        false
+    );
+});

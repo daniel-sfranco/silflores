@@ -8,30 +8,41 @@
 
 {% block content%}
     {% if user.is_authenticated %}
-        <input type="hidden" name="auth" id="auth" data-auth="True" data-user={{user.username}}>
+        <input type="hidden" name="auth" id="auth" data-auth="True" data-user={{user.username}} data-page="page">
     {% else %}
         <input type="hidden" name="auth" id="auth" data-auth="False">
     {% endif %}
     <p style="display:none;" data-size={{product.size}} data-slug={{product.slug}} data-auth={{user.is_authenticated}} id="data"></p>
     <section>
         <h1>{{product.page}}</h1>
-            {% for image in product.photos.all %}
-                <img src="{{image.photo.url}}" alt="{{image.label}}" class="product_photo"/>
-            {% endfor %}
-            <h2>{{ product.name }}</h2>
-            <p>Descrição: <br>{{ product.desc }}</p>
-            <p>Preço: R${{ product.price }}</p>
-            <p>Tags:</p>
-            <ul>
-            {% for tag in product.tags.all %}
-                {% if tag.name != 'all' %}
-                    <li>{{tag.name}}</li>
-                {% endif %}
-            {% endfor %}
-            </ul>
-            {% if product.size == 'set' %}
-                <p>INFORMAR O TAMANHO NO ATO DA COMPRA</p>
+        <div class="carousel my-5">
+            <div id="carouselExampleControls" class="carousel slide" data-rs-ride="carousel">
+                <div class="carousel-inner" id="photo-carousel"></div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev" id="prev-photo-button">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next" id="next-photo-button">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </div>
+
+        <h2>{{ product.name }}</h2>
+        <p>Descrição: <br>{{ product.desc }}</p>
+        <p>Preço: R${{ product.price }}</p>
+        <p>Tags:</p>
+        <ul>
+        {% for tag in product.tags.all %}
+            {% if tag.name != 'all' %}
+                <li>{{tag.name}}</li>
             {% endif %}
+        {% endfor %}
+        </ul>
+        {% if product.size == 'set' %}
+            <p>INFORMAR O TAMANHO NO ATO DA COMPRA</p>
+        {% endif %}
     </section>
     {% if user.is_authenticated and user.is_superuser %}
         <a href="{% url 'products:update' product.slug %}" class="form-submit">Atualizar Produto</a>
@@ -52,4 +63,6 @@
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
         <script src="{% static "js/product_page.js" %}"></script>
     {% endif %}
+
+    <script src="{% static "js/product_photo_carousel.js" %}"></script>
 {% endblock%}
