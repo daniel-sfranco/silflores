@@ -1,7 +1,11 @@
 import os
 import requests
+from datetime import datetime, timedelta
+import urllib.parse
 from django.conf import settings
 from users.models import CustomUser
+from .models import MelhorEnvioToken
+from pyppeteer import launch #type:ignore
 
 class MelhorEnvioAPI:
     def __init__(self):
@@ -9,25 +13,58 @@ class MelhorEnvioAPI:
         self.client_secret = settings.MELHOR_ENVIO_CLIENT_SECRET
         self.token_url = settings.MELHOR_ENVIO_LINK + '/oauth/token'
         self.api_url = settings.MELHOR_ENVIO_LINK + '/api/v2'
-        self.token = settings.MELHOR_ENVIO_TOKEN
+        self.token = MelhorEnvioToken.objects.all()[0].access_token
+        self.refresh_token = MelhorEnvioToken.objects.all()[0].refresh_token
+        self.state = "randomstring123"
+        self.scope = 'cart-read cart-write companies-read companies-write coupons-read coupons-write notifications-read offline-access orders-read products-read products-write purchases-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking ecommerce-shipping users-read users-write'
 
-    def get_access_token(self):
-        data = {
-            'grant_type': 'client_credentials',
+    def init_auth(self):
+        auth_params = {
             'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            'scope': 'cart-read cart-write companies-read companies-write coupons-read coupons-write notifications-read orders-read products-read products-write purchases-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking ecommerce-shipping users-read users-write',
+            'scope': self.scope,
+            'response_type': 'code',
+            'state': self.state,
         }
-        headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "User-Agent": "danielsfranco346@gmail.com"
-        }
-        response = requests.post(self.token_url, data=data, headers=headers)
-        if response.status_code == 200:
-            return response.json()['access_token']
+        if(bool(int(settings.DEBUG))):
+            auth_params['redirect_uri'] = f'{settings.NGROK_URL}thanks'
         else:
-            raise Exception('Falha ao obter token de acesso')
+            auth_params['redirect_uri'] = f'{settings.PRODUCTION_URL}thanks'
+        return f"https://melhorenvio.com.br/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
+
+    def check_token(self, access_token):
+        url = "https://melhorenvio.com.br/api/v2/me"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return True # Token válido
+        elif response.status_code == 401:
+            return False  # Token inválido ou expirado
+        else:
+            raise Exception(f"Erro inesperado: {response.status_code} - {response.text}")
+
+    def refresh_melhorenvio_token(self, token_instance):
+        if datetime.now().timestamp() > (token_instance.updated_at.timestamp() + token_instance.expires_in - 300):  # Renova 5 min antes de expirar
+            url = "https://melhorenvio.com.br/oauth/token"
+            payload = {
+                "grant_type": "refresh_token",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "refresh_token": token_instance.refresh_token
+            }
+            response = requests.post(url, data=payload)
+            if response.status_code == 200:
+                data = response.json()
+                token_instance.access_token = data["access_token"]
+                token_instance.refresh_token = data.get("refresh_token", token_instance.refresh_token)  # Atualiza se novo refresh_token for retornado
+                token_instance.expires_in = data["expires_in"]
+                token_instance.save()
+                return token_instance.access_token
+            else:
+                raise Exception("Erro ao renovar token")
+        return token_instance.access_token
 
     def calculate_shipping(self, user):
         payload = {
@@ -59,6 +96,7 @@ class MelhorEnvioAPI:
             raise Exception('Falha ao calcular frete')
 
     def add_to_cart(self, user):
+        self.get_access_token()
         cep = user.cep.replace("-", "")
         address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
         payload = {
@@ -92,14 +130,13 @@ class MelhorEnvioAPI:
                 "state_abbr": address['uf'],
                 "country_id": "BR",
                 "postal_code": f"{cep}",
-                "note": "string"
-            },
+                },
             "products": [],
             "package": {
-                "weight": "0.3",
-                "width": "18",
-                "height": "8",
-                "length": "27",
+                "weight": 0.3,
+                "width": 18,
+                "height": 8,
+                "length": 27,
             },
             "options": {
                 "insurance_value": f"{user.cart.fullPrice}",
@@ -114,12 +151,11 @@ class MelhorEnvioAPI:
         }
 
         cart = user.cart
-        for item in cart.items:
+        for item in cart.items.all():
             product = {
-                "description": item.product.name,
-                "quantity": item.quantity,
-                "price": item.product.price,
-                "weight": 1
+                "name": item.product.name,
+                "quantity": int(item.quantity),
+                "unitary_value": float(item.product.price),
             }
             payload['products'].append(product)
 
@@ -153,7 +189,6 @@ class MelhorEnvioAPI:
             return response.json()
         raise Exception("Failed to pay shipments")
 
-
     def generate_labels(self, shipmentId):
         url=f"{self.api_url}/me/shipment/generate"
         headers = {
@@ -186,3 +221,22 @@ class MelhorEnvioAPI:
         if response.status_code < 400:
             return response.json()
         raise Exception("Failed to track shipment")
+
+async def generate_pdf_from_url(url, token=None):
+    browser = await launch(
+        headless=True,
+        args=['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath='/usr/bin/chromium-browser',
+    )
+    page = await browser.newPage()
+    if(token):
+        headers = {"Authorization": f"Bearer {token}"}
+        await page.setExtraHTTPHeaders(headers)
+    await page.goto(url, {"waitUntil": "networkidle2"})
+    pdf = await page.pdf({
+        "format": "A4",
+        "printBackground": True,
+        "margin": {"top": "0mm", "left": "0mm", "bottom": "0mm", "rignt": "0mm"}
+    })
+    await browser.close()
+    return pdf

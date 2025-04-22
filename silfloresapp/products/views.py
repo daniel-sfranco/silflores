@@ -167,6 +167,8 @@ def product_update(request, slug):
                 elif(product.size == 'fixed'):
                     sizeObject = CartItem(cart=request.user.cart, product=product, quantity=0, fullPrice=product.price, size=float(product.size))
                     sizeObject.save()
+            if(product.name != product_form.cleaned_data['name']):
+                product.slug = check_slug(product_form.cleaned_data['name'])
             product.save()
             tags = tag_list(product_form.cleaned_data['tags'])
             product.tags.set(tags)

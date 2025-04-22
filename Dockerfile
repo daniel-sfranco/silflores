@@ -1,4 +1,4 @@
-FROM python:3.12.5-alpine3.20
+FROM python:alpine3.21
 LABEL maintainer="danielsfranco346@gmail.com"
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -29,6 +29,14 @@ RUN python -m venv /venv && \
   chmod -R +x /scripts && \
   apk add postgresql-client && \
   apk add --no-cache curl && \
+  apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont && \
+  rm -rf /var/cache/apk/* && \
   curl -o /cloud_sql_proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.6.1/cloud-sql-proxy.linux.amd64 && \
   chmod +x /cloud_sql_proxy
 

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <input type="hidden" id="data" data-con="{{cartUser.username}}" data-user="{{user.username}}" data-debug="{{debug}}">
+    <input type="hidden" id="data" data-con="{{cartUser.username}}" data-user="{{user.username}}" data-name="{{user.name}}" data-debug="{{debug}}">
     <input type="hidden" name="add" id="btnAddCart">
     <h1>Cart Page</h1>
     <p>{{cartUser.name}}</p>
@@ -60,8 +60,7 @@
             <p>Status: Aguardando pagamento</p>
         {% elif cart.status == 'paid' %}
             <p>Status: Pago</p>
-            <select name="boxSize" id="boxSize"></select>
-            <button id="generateTicket" data-user={{cartUser.username}}>Gerar etiqueta</button>
+            <button id="generateTicket" data-user={{cartUser.username}} data-name="{{cartUser.name}}">Gerar etiqueta</button>
             <script src="{% static "js/generate_ticket.js" %}"></script>
         {% endif %}
     {% endif %}

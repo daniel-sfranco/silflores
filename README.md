@@ -16,7 +16,7 @@ Este projeto foi desenvolvido utilizando as seguintes tecnologias:
 
 Para executar o projeto localmente, siga os passos abaixo:
 
-1. Certifique-se de que todas as dependências necessárias estão instaladas, incluindo Docker.
+1. Certifique-se de que o Docker está instalado na sua máquina.
 2. No terminal, navegue até o diretório raiz do projeto.
 3. Execute o comando abaixo:
 
@@ -24,7 +24,7 @@ Para executar o projeto localmente, siga os passos abaixo:
 docker-compose up --build
 ```
 
-Este comando iniciará o ambiente local do projeto.
+Este comando iniciará o ambiente local do projeto. Caso esteja executando o comando pela primeira vez, o comando irá fazer o pull dos contâineres do Psql e do Redis, além de fazer a build do próprio contâiner do projeto, portanto pode levar alguns minutos para a sua execução.
 
 ### Reiniciando o Projeto
 
@@ -33,6 +33,8 @@ Após a configuração inicial, para rodar novamente o projeto, basta executar o
 ```bash
 docker-compose up
 ```
+
+Em alguns segundos o servidor estará iniciado, e poderá ser acessado no localhost, na porta 8000.
 
 ## Contribuição
 

@@ -12,6 +12,7 @@ urlpatterns = [
     path('user/', include('users.urls')),
     path('cart/', include('cart.urls')),
     path('getSoldProducts/', views.getSoldProducts, name="getSoldProducts"),
+    path('getNewProducts/', views.getNewProducts, name="getNewProducts"),
     path('meme', views.meme, name='meme'),
 ]
 

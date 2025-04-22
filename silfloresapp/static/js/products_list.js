@@ -154,7 +154,6 @@ productCards.forEach((card) => {
     card.addEventListener('click', function() {
         window.location.href = card.querySelector('a').href;
     })
-
     card.addEventListener('mouseover', function() {
         card.style.cursor = 'pointer';
     }

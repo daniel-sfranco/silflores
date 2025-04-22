@@ -1,5 +1,6 @@
 function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
-    const innerCarousel = document.getElementById(carouselId);
+    const carousel = document.getElementById(carouselId);
+    const innerCarousel = carousel.querySelector(".carousel-inner");
     const width = window.screen.width;
     let elementsPerRow = 4;
     if (width < 576) {
@@ -53,8 +54,8 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
         innerCarousel.appendChild(actRow);
     }
     if(numElements <= elementsPerRow){
-        const prev = document.getElementById('prev-photo-button')
-        const next = document.getElementById('next-photo-button')
+        const prev = carousel.querySelector('.carousel-control-prev')
+        const next = carousel.querySelector('.carousel-control-next')
         prev.setAttribute("style", "display: none")
         next.setAttribute("style", "display: none")
     }
@@ -70,7 +71,23 @@ fetch("/getSoldProducts/")
     setCarousel(
         soldProducts,
         numSoldProducts,
-        "sold-carousel",
+        "sold",
+        "/products/",
+        false
+    );
+});
+
+let newProducts = 0;
+let numNewProducts = 0;
+fetch("/getNewProducts/")
+.then((response) => response.json())
+.then((data) => {
+    newProducts = JSON.parse(data.newProducts);
+    numNewProducts = data.numNewProducts;
+    setCarousel(
+        newProducts,
+        numNewProducts,
+        "new",
         "/products/",
         false
     );

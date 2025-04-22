@@ -18,3 +18,11 @@ searchInput.addEventListener('keypress', function(e) {
 secLogo.addEventListener('click', function() {
     window.location.href = "/";
 })
+
+secLogo.addEventListener('mouseover', function() {
+    secLogo.style.cursor = 'pointer';
+}
+)
+secLogo.addEventListener('mouseout', function() {
+    secLogo.style.cursor = 'auto';
+})

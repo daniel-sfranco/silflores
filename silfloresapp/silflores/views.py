@@ -18,3 +18,10 @@ def getSoldProducts(request):
     soldProductsQuery = Product.objects.all().order_by('-numSold')[:numSoldProducts]
     soldProducts = [{'name': product.name, 'desc': product.desc, 'imageUrl': product.firstPhoto.url} for product in soldProductsQuery]
     return JsonResponse({'soldProducts': json.dumps(soldProducts), 'numSoldProducts': numSoldProducts})
+
+def getNewProducts(request):
+    totalProductQuantity = Product.objects.all().count()
+    numNewProducts = min(totalProductQuantity, 20)
+    newProductsQuery = Product.objects.all().order_by('-createdAt')[:numNewProducts]
+    newProducts = [{'name': product.name, 'desc': product.desc, 'imageUrl': product.firstPhoto.url} for product in newProductsQuery]
+    return JsonResponse({'newProducts': json.dumps(newProducts), 'numNewProducts': numNewProducts})

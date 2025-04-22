@@ -8,17 +8,31 @@
 
 {% block content%}
     <h1>Home page</h1>
-    <p>check out my <a href="about/">about</a> page</p>
 
     <h4>Mais Vendidos</h4>
-    <div class="carousel">
+    <div class="carousel" id="sold">
         <div id="carouselExampleControls" class="carousel slide" data-rs-ride="carousel">
-            <div class="carousel-inner" id="sold-carousel"></div>
+            <div class="carousel-inner" id="carousel-inner"></div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev" id="prev-photo-button">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Anterior</span>
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next" id="next-photo-button">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+            </button>
+        </div>
+    </div>
+
+    <h4>Novidades</h4>
+    <div class="carousel" id="new">
+        <div id="carouselExampleControls" class="carousel slide" data-rs-ride="carousel">
+            <div class="carousel-inner" id="carousel-inner"></div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev" id="new-prev-photo-button">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next" id="new-next-photo-button">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Próximo</span>
             </button>

@@ -51,3 +51,9 @@ class Coupon(models.Model):
     name = models.CharField(max_length=20, verbose_name="Nome")
     type = models.CharField(choices=types, verbose_name="Tipo")
     value = models.DecimalField(decimal_places=2, max_digits=6)
+
+class MelhorEnvioToken(models.Model):
+    access_token = models.CharField(max_length=255, blank=True)
+    refresh_token = models.CharField(max_length=255, blank=True)
+    expires_in = models.IntegerField()
+    updated_at = models.DateTimeField(auto_now=True)

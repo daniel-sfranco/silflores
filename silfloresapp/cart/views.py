@@ -1,15 +1,18 @@
 import json
+import asyncio
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from users.models import CustomUser
-from .models import Cart, CartItem, Message
-from products.models import Product
 from django.utils import timezone
-from .pagseguro_service import PagSeguroAPI
-from .melhorenvio_service import MelhorEnvioAPI
 from django.conf import settings
+from asgiref.sync import async_to_sync
+from pyppeteer import launch #type:ignore
+from users.models import CustomUser
+from .models import Cart, CartItem, Message, MelhorEnvioToken
+from products.models import Product
+from .pagseguro_service import PagSeguroAPI
+from .melhorenvio_service import MelhorEnvioAPI, generate_pdf_from_url
 
 
 @login_required(login_url="/user/login")
@@ -182,14 +185,23 @@ def thanks(request):
 def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
     MelhorEnvioObject = MelhorEnvioAPI()
+    if not MelhorEnvioObject.check_token(user):
+        token_instance = MelhorEnvioObject.refresh_melhorenvio_token(MelhorEnvioToken.objects.all()[0])
     insertResponse = MelhorEnvioObject.add_to_cart(user)
     buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
     generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
-    user.cart.status = "ticket"
+    #user.cart.status = "ticket"
     user.cart.shipmentId = insertResponse['id']
     user.cart.save()
-    for item in user.cart.items:
+    for item in user.cart.items.all():
         product = item.product
         product.numSold += item.quantity
         product.save()
-    return JsonResponse(data=generateResponse)
+    pdf_url = generateResponse.get('url')
+    if not pdf_url:
+        return HttpResponse("Link de impressão não encontrado", status=400)
+    generate_pdf = async_to_sync(generate_pdf_from_url)
+    pdf = generate_pdf(pdf_url, settings.MELHOR_ENVIO_TOKEN)
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="Etiqueta {user.name}.pdf"'
+    return response
