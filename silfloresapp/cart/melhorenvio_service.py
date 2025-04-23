@@ -1,6 +1,6 @@
 import os
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 import urllib.parse
 from django.conf import settings
 from users.models import CustomUser
@@ -8,15 +8,22 @@ from .models import MelhorEnvioToken
 from pyppeteer import launch #type:ignore
 
 class MelhorEnvioAPI:
-    def __init__(self):
-        self.client_id = settings.MELHOR_ENVIO_CLIENT_ID
-        self.client_secret = settings.MELHOR_ENVIO_CLIENT_SECRET
+    def __init__(self, check=True):
+        instance = MelhorEnvioToken.objects.first()
+        self.client_id = settings.MELHOR_ENVIO_ID
+        self.client_secret = settings.MELHOR_ENVIO_SECRET
         self.token_url = settings.MELHOR_ENVIO_LINK + '/oauth/token'
         self.api_url = settings.MELHOR_ENVIO_LINK + '/api/v2'
-        self.token = MelhorEnvioToken.objects.all()[0].access_token
-        self.refresh_token = MelhorEnvioToken.objects.all()[0].refresh_token
+        self.token = instance.access_token
+        self.refresh_token = instance.refresh_token
         self.state = "randomstring123"
-        self.scope = 'cart-read cart-write companies-read companies-write coupons-read coupons-write notifications-read offline-access orders-read products-read products-write purchases-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking ecommerce-shipping users-read users-write'
+        self.scope = 'cart-read cart-write companies-read companies-write coupons-read coupons-write notifications-read orders-read products-read products-write purchases-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking ecommerce-shipping users-read users-write'
+        self.updated_at = instance.updated_at
+        self.expires_in = instance.expires_in
+        valid = self.check_token(instance)
+        if(valid != True and check):
+            raise Exception(valid)
+
 
     def init_auth(self):
         auth_params = {
@@ -26,45 +33,65 @@ class MelhorEnvioAPI:
             'state': self.state,
         }
         if(bool(int(settings.DEBUG))):
-            auth_params['redirect_uri'] = f'{settings.NGROK_URL}thanks'
+            auth_params['redirect_uri'] = f'{settings.NGROK_URL}'
         else:
-            auth_params['redirect_uri'] = f'{settings.PRODUCTION_URL}thanks'
-        return f"https://melhorenvio.com.br/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
+            auth_params['redirect_uri'] = f'{settings.PRODUCTION_URL}'
+        return f"{settings.MELHOR_ENVIO_LINK}/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
 
-    def check_token(self, access_token):
-        url = "https://melhorenvio.com.br/api/v2/me"
+    def check_token(self, instance):
+        url = f"{self.api_url}/me"
         headers = {
-            "Authorization": f"Bearer {access_token}",
+            "Authorization": f"Bearer {self.token}",
             "Accept": "application/json"
         }
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             return True # Token válido
-        elif response.status_code == 401:
-            return False  # Token inválido ou expirado
+        elif response.status_code == 401: # Token expirado
+            if(self.refresh_token == "0"): # Token não existe
+                return self.init_auth()
+            else: # Token expirado
+                self.refresh_melhorenvio_token(token_instance=instance)
+                return True
         else:
             raise Exception(f"Erro inesperado: {response.status_code} - {response.text}")
 
-    def refresh_melhorenvio_token(self, token_instance):
-        if datetime.now().timestamp() > (token_instance.updated_at.timestamp() + token_instance.expires_in - 300):  # Renova 5 min antes de expirar
-            url = "https://melhorenvio.com.br/oauth/token"
+    def refresh_melhorenvio_token(self, token_instance, code=None):
+        payload = {
+            "grant_type": "refresh_token",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "refresh_token": token_instance.refresh_token
+        }
+        if(code):
+            payload = {
+                "grant_type": "authorization_code",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "redirect_uri": f"{settings.NGROK_URL}",
+                "code": code
+            }
+        else:
             payload = {
                 "grant_type": "refresh_token",
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
                 "refresh_token": token_instance.refresh_token
             }
-            response = requests.post(url, data=payload)
-            if response.status_code == 200:
-                data = response.json()
-                token_instance.access_token = data["access_token"]
-                token_instance.refresh_token = data.get("refresh_token", token_instance.refresh_token)  # Atualiza se novo refresh_token for retornado
-                token_instance.expires_in = data["expires_in"]
-                token_instance.save()
-                return token_instance.access_token
-            else:
-                raise Exception("Erro ao renovar token")
-        return token_instance.access_token
+        response = requests.post(self.token_url, data=payload)
+        if response.status_code == 200:
+            data = response.json()
+            token_instance.access_token = data["access_token"]
+            token_instance.refresh_token = data.get("refresh_token", token_instance.refresh_token)  # Atualiza se novo refresh_token for retornado
+            token_instance.expires_in = data["expires_in"]
+            token_instance.save()
+            self.access_token = token_instance.access_token
+            self.refresh_token = token_instance.refresh_token
+            self.expires_in = token_instance.expires_in
+            self.updated_at = datetime.now()
+            return True
+        else:
+            raise Exception(f"Erro ao renovar token: {response.status_code} {response.text}")
 
     def calculate_shipping(self, user):
         payload = {
@@ -93,7 +120,7 @@ class MelhorEnvioAPI:
         if response.status_code == 200:
             return response.json()
         else:
-            raise Exception('Falha ao calcular frete')
+            raise Exception(f'Falha ao calcular frete. Código: {response.status_code}. Corpo: {response.json()}')
 
     def add_to_cart(self, user):
         self.get_access_token()
@@ -170,7 +197,7 @@ class MelhorEnvioAPI:
         response.raise_for_status()
         if response.status_code < 400:
             return response.json()
-        raise Exception("Failed to create shipment")
+        raise Exception("Failed to create shipment" + response.text)
 
     def buy_shipments(self, id):
         url=f"{self.api_url}/me/shipment/checkout"
@@ -187,7 +214,7 @@ class MelhorEnvioAPI:
         response.raise_for_status()
         if response.status_code < 400:
             return response.json()
-        raise Exception("Failed to pay shipments")
+        raise Exception("Failed to pay shipments" + response.text)
 
     def generate_labels(self, shipmentId):
         url=f"{self.api_url}/me/shipment/generate"
@@ -205,7 +232,7 @@ class MelhorEnvioAPI:
         response = requests.post(url, headers=headers, json=payload)
         if response.status_code < 400:
             return response.json()
-        raise Exception("Failed to generate labels")
+        raise Exception("Failed to generate labels" + response.text)
 
     def track_shipment(self, shipmentId):
         url=f"{self.api_url}/me/shipment/track/{shipmentId}"
@@ -220,7 +247,7 @@ class MelhorEnvioAPI:
         print(response.status_code)
         if response.status_code < 400:
             return response.json()
-        raise Exception("Failed to track shipment")
+        raise Exception("Failed to track shipment" + response.text)
 
 async def generate_pdf_from_url(url, token=None):
     browser = await launch(

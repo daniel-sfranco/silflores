@@ -1,9 +1,17 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
-from products.models import Product, Photo, Tag
+from products.models import Product
+from cart.melhorenvio_service import MelhorEnvioAPI
+from cart.models import MelhorEnvioToken
 
 def home(request):
+    code = request.GET.get('code')
+    if(code):
+        melhorEnvioToken = MelhorEnvioToken.objects.first()
+        melhorEnvioObject = MelhorEnvioAPI(check=False)
+        melhorEnvioObject.refresh_melhorenvio_token(melhorEnvioToken, code=code)
+        return redirect(melhorEnvioToken.prev_url)
     return render(request, 'home.html')
 
 def about(request):

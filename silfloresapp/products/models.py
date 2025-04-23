@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from cloudinary.models import CloudinaryField
 
 # Create your models here.
@@ -27,6 +28,8 @@ class Product(models.Model):
     numPhotos = models.IntegerField(default=0)
     numSold = models.IntegerField(default=0)
     firstPhoto = CloudinaryField('imagem', null=True, blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return str(self.name)

@@ -35,11 +35,14 @@ DEBUG = bool(int(os.getenv('DEBUG', '1')))
 PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
 PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')
 PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
-MELHOR_ENVIO_CLIENT_ID = os.getenv('MELHOR_ENVIO_CLIENT_ID')
-MELHOR_ENVIO_CLIENT_SECRET = os.getenv('MELHOR_ENVIO_CLIENT_SECRET')
 MELHOR_ENVIO_LINK = os.getenv('MELHOR_ENVIO_LINK')
-MELHOR_ENVIO_TOKEN = os.getenv('MELHOR_ENVIO_TOKEN')
-
+MELHOR_ENVIO_SANDBOX ="sandbox" in MELHOR_ENVIO_LINK
+if(MELHOR_ENVIO_SANDBOX):
+    MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_SANDBOX_ID')
+    MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SANDBOX_SECRET')
+else:
+    MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_ID')
+    MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SECRET')
 
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
@@ -48,7 +51,7 @@ ALLOWED_HOSTS = [
 NGROK_URL = os.getenv('NGROK_URL', 'change-me')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.ngrok-free.app' 
+    'https://*.ngrok-free.app'
 ]
 
 

@@ -130,8 +130,19 @@ def get_messages(request, username):
 def confirm_purchase(request, username):
     user = CustomUser.objects.get(username=username)
     if(user.username == username):
-        MelhorEnvioObject = MelhorEnvioAPI()
+        try:
+            MelhorEnvioObject = MelhorEnvioAPI()
+        except Exception as e:
+            print(e.args[0])
+            if("melhorenvio" in str(e)):
+                instance = MelhorEnvioToken.objects.first()
+                instance.prev_url = request.path
+                instance.save()
+                return redirect(e.args[0])
+            else:
+                return redirect(f'/cart/{request.user.username}/page')
         response = MelhorEnvioObject.calculate_shipping(user=user)
+        print(response)
         for option in response:
             if 'error' in option.keys():
                 response.remove(option)
@@ -184,9 +195,13 @@ def thanks(request):
 
 def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
-    MelhorEnvioObject = MelhorEnvioAPI()
-    if not MelhorEnvioObject.check_token(user):
-        token_instance = MelhorEnvioObject.refresh_melhorenvio_token(MelhorEnvioToken.objects.all()[0])
+    try:
+        MelhorEnvioObject = MelhorEnvioAPI()
+    except Exception as e:
+        instance = MelhorEnvioToken.objects.first()
+        instance.prev_url = request.path
+        instance.save()
+        redirect(e.args[0])
     insertResponse = MelhorEnvioObject.add_to_cart(user)
     buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
     generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
@@ -200,8 +215,9 @@ def get_ticket(request, username):
     pdf_url = generateResponse.get('url')
     if not pdf_url:
         return HttpResponse("Link de impressão não encontrado", status=400)
+    token_instance = MelhorEnvioToken.objects.first()
     generate_pdf = async_to_sync(generate_pdf_from_url)
-    pdf = generate_pdf(pdf_url, settings.MELHOR_ENVIO_TOKEN)
+    pdf = generate_pdf(pdf_url, token_instance.access_token)
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="Etiqueta {user.name}.pdf"'
     return response

@@ -53,7 +53,9 @@ class Coupon(models.Model):
     value = models.DecimalField(decimal_places=2, max_digits=6)
 
 class MelhorEnvioToken(models.Model):
-    access_token = models.CharField(max_length=255, blank=True)
-    refresh_token = models.CharField(max_length=255, blank=True)
+    access_token = models.TextField(blank=True)
+    refresh_token = models.TextField(blank=True, null=True)
     expires_in = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
+    prev_url = models.CharField(max_length=255, blank=True)
+    code = models.TextField(blank=True)
