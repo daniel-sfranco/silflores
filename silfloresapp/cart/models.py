@@ -58,4 +58,3 @@ class MelhorEnvioToken(models.Model):
     expires_in = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
     prev_url = models.CharField(max_length=255, blank=True)
-    code = models.TextField(blank=True)
