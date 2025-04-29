@@ -32,17 +32,18 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', '1')))
 
+PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
 PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
 PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')
-PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
-MELHOR_ENVIO_LINK = os.getenv('MELHOR_ENVIO_LINK')
-MELHOR_ENVIO_SANDBOX ="sandbox" in MELHOR_ENVIO_LINK
+
+MELHOR_ENVIO_SANDBOX = bool(int(os.getenv('MELHOR_ENVIO_SANDBOX', 1)))
+MELHOR_ENVIO_LINK = "https://melhorenvio.com.br"
+MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_ID')
+MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SECRET')
 if(MELHOR_ENVIO_SANDBOX):
+    MELHOR_ENVIO_LINK = "https://sandbox.melhorenvio.com.br"
     MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_SANDBOX_ID')
     MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SANDBOX_SECRET')
-else:
-    MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_ID')
-    MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SECRET')
 
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()

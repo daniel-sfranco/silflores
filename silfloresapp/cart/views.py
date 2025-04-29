@@ -1,6 +1,6 @@
 import json
 import asyncio
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -131,7 +131,7 @@ def confirm_purchase(request, username):
     user = CustomUser.objects.get(username=username)
     if(user.username == username):
         try:
-            MelhorEnvioObject = MelhorEnvioAPI()
+            MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
         except Exception as e:
             print(e.args[0])
             if("melhorenvio" in str(e)):
@@ -142,8 +142,8 @@ def confirm_purchase(request, username):
             else:
                 return redirect(f'/cart/{request.user.username}/page')
         response = MelhorEnvioObject.calculate_shipping(user=user)
-        print(response)
         for option in response:
+            print(option)
             if 'error' in option.keys():
                 response.remove(option)
         return render(request, 'cart/cart_confirm.html', {'freight': response})
@@ -193,18 +193,28 @@ def thanks(request):
     return render(request, 'cart/cart_thanks.html')
 
 
+@login_required(login_url="/user/login")
+@user_passes_test(lambda u: u.is_superuser)
 def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
+    MelhorEnvioObject = 0
+    insertResponse = buyResponse = generateResponse = {'id':''}
     try:
-        MelhorEnvioObject = MelhorEnvioAPI()
+        MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
+        insertResponse = MelhorEnvioObject.add_to_cart(user)
+        print(insertResponse)
+        buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
+        generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
     except Exception as e:
-        instance = MelhorEnvioToken.objects.first()
-        instance.prev_url = request.path
-        instance.save()
-        redirect(e.args[0])
-    insertResponse = MelhorEnvioObject.add_to_cart(user)
-    buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
-    generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
+        print(e.args[0])
+        if("melhorenvio" in str(e)):
+            print(1)
+            instance = MelhorEnvioToken.objects.first()
+            instance.prev_url = request.path
+            instance.save()
+            return JsonResponse({"url":e.args[0]})
+        else:
+            print(2)
     #user.cart.status = "ticket"
     user.cart.shipmentId = insertResponse['id']
     user.cart.save()

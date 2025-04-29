@@ -9,8 +9,8 @@ def home(request):
     code = request.GET.get('code')
     if(code):
         melhorEnvioToken = MelhorEnvioToken.objects.first()
-        melhorEnvioObject = MelhorEnvioAPI(check=False)
-        melhorEnvioObject.refresh_melhorenvio_token(melhorEnvioToken, code=code)
+        melhorEnvioObject = MelhorEnvioAPI(request.user.is_superuser, check=False)
+        melhorEnvioObject.refresh_melhorenvio_token(code=code)
         return redirect(melhorEnvioToken.prev_url)
     return render(request, 'home.html')
 
