@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import redirect, render
 from django.http import JsonResponse
+from django.conf import settings
 from products.models import Product
 from cart.melhorenvio_service import MelhorEnvioAPI
 from cart.models import MelhorEnvioToken
@@ -8,7 +9,7 @@ from cart.models import MelhorEnvioToken
 def home(request):
     code = request.GET.get('code')
     if(code):
-        melhorEnvioToken = MelhorEnvioToken.objects.first()
+        melhorEnvioToken = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
         melhorEnvioObject = MelhorEnvioAPI(request.user.is_superuser, check=False)
         melhorEnvioObject.refresh_melhorenvio_token(code=code)
         return redirect(melhorEnvioToken.prev_url)

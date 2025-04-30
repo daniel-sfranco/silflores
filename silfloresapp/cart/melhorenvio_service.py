@@ -10,7 +10,7 @@ from pyppeteer import launch #type:ignore
 
 class MelhorEnvioAPI:
     def __init__(self, superuser:bool, check=True):
-        instance = MelhorEnvioToken.objects.first()
+        instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
         self.client_id = settings.MELHOR_ENVIO_ID
         self.client_secret = settings.MELHOR_ENVIO_SECRET
         self.token_url = settings.MELHOR_ENVIO_LINK + '/oauth/token'
@@ -61,7 +61,7 @@ class MelhorEnvioAPI:
             raise Exception(f"Erro inesperado: {response.status_code} - {response.text}")
 
     def refresh_melhorenvio_token(self, code=None):
-        token_instance = MelhorEnvioToken.objects.first()
+        token_instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
         payload = {
             "client_id": self.client_id,
             "client_secret": self.client_secret,
@@ -102,7 +102,7 @@ class MelhorEnvioAPI:
                 "weight": 0.3
             },
             "options": {
-                "insurance_value": f"user.cart.fullPrice",
+                "insurance_value": f"{user.cart.fullPrice}",
                 "receipt": False,
                 "own_hand": False
             }
@@ -127,7 +127,7 @@ class MelhorEnvioAPI:
         cep = user.cep.replace("-", "")
         address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
         payload = {
-            "service": f"{int(user.cart.freightOption == 'SEDEX') + 1}",
+            "service": f"{user.cart.freightOption}",
             "from": {
                 "name": os.getenv('ADMIN_NAME', 'change-me'),
                 "phone": os.getenv('ADMIN_PHONE', 'change-me'),
@@ -159,12 +159,6 @@ class MelhorEnvioAPI:
                 "postal_code": f"{cep}",
                 },
             "products": [],
-            "package": {
-                "weight": 0.3,
-                "width": 18,
-                "height": 8,
-                "length": 27,
-            },
             "options": {
                 "insurance_value": f"{user.cart.fullPrice}",
                 "receipt": False,
@@ -176,6 +170,20 @@ class MelhorEnvioAPI:
                 "tags": []
             }
         }
+        if(user.cart.freightOption <= 2 or user.cart.freightOption > 4):
+            payload["package"] = {
+                "weight": 0.3,
+                "width": 18,
+                "height": 8,
+                "length": 27,
+            }
+        else:
+            payload["volumes"] = [{
+                "weight": 0.3,
+                "width": 16,
+                "height": 6,
+                "length": 18,
+            }]
 
         cart = user.cart
         for item in cart.items.all():

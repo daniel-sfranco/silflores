@@ -10,24 +10,12 @@ ticketButton.onclick = function(){
             'X-CSRFToken': csrftoken,
         }
     })
-    .then(response => {
-        if(response.headers.get('content-type').includes('application/json') && response.status === 200){
-            response.json().then(json => {
-                if (json.url) {
-                    window.open(json.url, '_blank');
-                }
-            })
-        } else {
-            response.blob().then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `Etiqueta ${nameuser}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            });
+    .then(response => response.json())
+    .then(data => {
+        if(data.url){
+            const ticketUrl = data.url
+            const ticketWindow = window.open(ticketUrl, '_blank')
+            ticketWindow.focus()
         }
     })
 }

@@ -13,7 +13,7 @@ finishButton.onclick = function() {
             'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({
-            'freight_option': freightOption.value,
+            'freight_option': parseInt(freightOption.getAttribute('data-id')),
             'freight_value': freightValue.innerText
         })
     })

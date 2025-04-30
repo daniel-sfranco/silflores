@@ -9,7 +9,7 @@ if(debug == "0" || debug == 0 || debug == 'False'){
     debug = false
 }
 if(debug){
-    ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
+    ws = new WebSocket(`wss://${wsUrl.host}/ws/chat/${cartUser}-cart`);
 } else {
     ws = new WebSocket(`wss://${wsUrl.host}/ws/chat/${cartUser}-cart`);
 }

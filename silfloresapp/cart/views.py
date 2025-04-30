@@ -135,7 +135,7 @@ def confirm_purchase(request, username):
         except Exception as e:
             print(e.args[0])
             if("melhorenvio" in str(e)):
-                instance = MelhorEnvioToken.objects.first()
+                instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
                 instance.prev_url = request.path
                 instance.save()
                 return redirect(e.args[0])
@@ -145,6 +145,8 @@ def confirm_purchase(request, username):
         for option in response:
             print(option)
             if 'error' in option.keys():
+                response.remove(option)
+            if option['company']['name'] != 'Correios' and not settings.MELHOR_ENVIO_SANDBOX:
                 response.remove(option)
         return render(request, 'cart/cart_confirm.html', {'freight': response})
     else:
@@ -190,6 +192,27 @@ def thanks(request):
     cart.status = "paid"
     cart.paymentDatetime = timezone.now()
     cart.save()
+    MelhorEnvioObject = 0
+    insertResponse = buyResponse = generateResponse = {'id':''}
+    try:
+        MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
+        insertResponse = MelhorEnvioObject.add_to_cart(user)
+        buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
+        generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
+    except Exception as e:
+        if("melhorenvio" in str(e)):
+            instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
+            instance.prev_url = request.path
+            instance.save()
+            return JsonResponse({"url":e.args[0]})
+    #user.cart.status = "ticket"
+    cart.shipmentId = insertResponse['id']
+    cart.labelUrl = generateResponse.get('url')
+    cart.save()
+    for item in cart.items.all():
+        product = item.product
+        product.numSold += item.quantity
+        product.save()
     return render(request, 'cart/cart_thanks.html')
 
 
@@ -197,37 +220,5 @@ def thanks(request):
 @user_passes_test(lambda u: u.is_superuser)
 def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
-    MelhorEnvioObject = 0
-    insertResponse = buyResponse = generateResponse = {'id':''}
-    try:
-        MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
-        insertResponse = MelhorEnvioObject.add_to_cart(user)
-        print(insertResponse)
-        buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
-        generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
-    except Exception as e:
-        print(e.args[0])
-        if("melhorenvio" in str(e)):
-            print(1)
-            instance = MelhorEnvioToken.objects.first()
-            instance.prev_url = request.path
-            instance.save()
-            return JsonResponse({"url":e.args[0]})
-        else:
-            print(2)
-    #user.cart.status = "ticket"
-    user.cart.shipmentId = insertResponse['id']
-    user.cart.save()
-    for item in user.cart.items.all():
-        product = item.product
-        product.numSold += item.quantity
-        product.save()
-    pdf_url = generateResponse.get('url')
-    if not pdf_url:
-        return HttpResponse("Link de impressão não encontrado", status=400)
-    token_instance = MelhorEnvioToken.objects.first()
-    generate_pdf = async_to_sync(generate_pdf_from_url)
-    pdf = generate_pdf(pdf_url, token_instance.access_token)
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="Etiqueta {user.name}.pdf"'
-    return response
+    url = user.cart.labelUrl
+    return JsonResponse({"url": url})
