@@ -103,6 +103,15 @@ def cart_deleteItem(request, pk):
 @login_required(login_url='/user/login')
 @user_passes_test(lambda u: u.is_superuser)
 def cart_orders(request):
+    try:
+        melhorEnvioObject = MelhorEnvioAPI(request.user.is_superuser)
+    except Exception as e:
+        print(e.args[0])
+        if("melhorenvio" in str(e)):
+            instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
+            instance.prev_url = request.path
+            instance.save()
+            return redirect(e.args[0])
     superusers = CustomUser.objects.filter(is_superuser=True)
     carts = Cart.objects.exclude(products=0).exclude(user__in=superusers)
     carts_items = {}
@@ -204,7 +213,7 @@ def thanks(request):
             instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
             instance.prev_url = request.path
             instance.save()
-            return JsonResponse({"url":e.args[0]})
+            return redirect(e.args[0])
     #user.cart.status = "ticket"
     cart.shipmentId = insertResponse['id']
     cart.labelUrl = generateResponse.get('url')
