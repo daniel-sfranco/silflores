@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
-import dj_database_url #type:ignore
+import dj_database_url
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -40,13 +40,14 @@ MELHOR_ENVIO_SANDBOX = bool(int(os.getenv('MELHOR_ENVIO_SANDBOX', 1)))
 MELHOR_ENVIO_LINK = "https://melhorenvio.com.br"
 MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_ID')
 MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SECRET')
-if(MELHOR_ENVIO_SANDBOX):
+if (MELHOR_ENVIO_SANDBOX):
     MELHOR_ENVIO_LINK = "https://sandbox.melhorenvio.com.br"
     MELHOR_ENVIO_ID = os.getenv('MELHOR_ENVIO_SANDBOX_ID')
     MELHOR_ENVIO_SECRET = os.getenv('MELHOR_ENVIO_SANDBOX_SECRET')
 
 ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
+# h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
+    "*"
 ]
 
 NGROK_URL = os.getenv('NGROK_URL', 'change-me')
@@ -249,4 +250,4 @@ ADMIN_DISTRICT = os.getenv("ADMIN_DISTRICT", "CHANGE-ME")
 ADMIN_CITY = os.getenv("ADMIN_CITY", "CHANGE-ME")
 ADMIN_UF = os.getenv("ADMIN_UF", "CHANGE-ME")
 ADMIN_COUNTRY = os.getenv("ADMIN_COUNTRY", "CHANGE-ME")
-ADMIN_CEP=os.getenv('ADMIN_CEP', 'change-me')
+ADMIN_CEP = os.getenv('ADMIN_CEP', 'change-me')
