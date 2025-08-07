@@ -1,44 +1,29 @@
 import os
-import requests
-from datetime import datetime
 import urllib.parse
+from datetime import datetime, timedelta
+
+import requests
 from django.conf import settings
 from django.utils import timezone
-from users.models import CustomUser
+from pyppeteer import launch
+
 from .models import MelhorEnvioToken
-from pyppeteer import launch #type:ignore
+
 
 class MelhorEnvioAPI:
-    def __init__(self, superuser:bool, check=True):
+    def __init__(self, superuser: bool, check=True):
         instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
         self.client_id = settings.MELHOR_ENVIO_ID
         self.client_secret = settings.MELHOR_ENVIO_SECRET
         self.token_url = settings.MELHOR_ENVIO_LINK + '/oauth/token'
         self.api_url = settings.MELHOR_ENVIO_LINK + '/api/v2'
         self.token = instance.access_token
-        self.refresh_token = instance.refresh_token
         self.state = "randomstring123"
         self.scope = 'cart-read cart-write companies-read companies-write coupons-read coupons-write notifications-read orders-read products-read products-write purchases-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-share shipping-tracking ecommerce-shipping users-read users-write'
-        self.updated_at = instance.updated_at
         self.expires_in = instance.expires_in
-        valid = self.check_token(superuser)
-        if(valid != True and check):
-            raise Exception(valid)
+        self.check_token(superuser)
 
-    def init_auth(self):
-        auth_params = {
-            'client_id': self.client_id,
-            'scope': self.scope,
-            'response_type': 'code',
-            'state': self.state,
-        }
-        if(bool(int(settings.DEBUG))):
-            auth_params['redirect_uri'] = f'{settings.NGROK_URL}'
-        else:
-            auth_params['redirect_uri'] = f'{settings.PRODUCTION_URL}'
-        return f"{settings.MELHOR_ENVIO_LINK}/oauth/authorize?{urllib.parse.urlencode(auth_params)}"
-
-    def check_token(self, superuser:bool):
+    def check_token(self, superuser: bool):
         url = f"{self.api_url}/me"
         headers = {
             "Authorization": f"Bearer {self.token}",
@@ -46,52 +31,15 @@ class MelhorEnvioAPI:
         }
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
-            finalDate = self.updated_at.replace(tzinfo=None) + timezone.timedelta(seconds=self.expires_in) - timezone.timedelta(days=7) # Data de expiração do token - 7 dias
-            if(self.refresh_token and (finalDate > datetime.now() and superuser)): # Token expirado
-                self.refresh_melhorenvio_token()
-            return True # Token válido
-        elif response.status_code == 401:
-            if(self.refresh_token): # Token expirado
-                self.refresh_melhorenvio_token()
-                return True
-            else: # Token não existe
-                return self.init_auth()
-
+            remainingTime = self.expires_in - timedelta(days=7)
+            if remainingTime < timezone.now():
+                print("Token prestes a expirar")
+            return True
         else:
             raise Exception(f"Erro inesperado: {response.status_code} - {response.text}")
 
-    def refresh_melhorenvio_token(self, code=None):
-        token_instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
-        payload = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-        }
-        if(code):
-            payload["grant_type"] = "authorization_code"
-            payload["code"] = code
-            payload['redirect_uri'] = f"{settings.NGROK_URL}"
-        else:
-            payload['grant_type'] = "refresh_token"
-            payload['refresh_token'] = self.refresh_token
-        response = requests.post(self.token_url, data=payload)
-        if response.status_code == 200:
-            data = response.json()
-            token_instance.access_token = data["access_token"]
-            token_instance.refresh_token = data.get("refresh_token", token_instance.refresh_token)  # Atualiza se novo refresh_token for retornado
-            token_instance.expires_in = data["expires_in"]
-            token_instance.save()
-            self.access_token = token_instance.access_token
-            self.refresh_token = token_instance.refresh_token
-            self.expires_in = token_instance.expires_in
-            self.updated_at = datetime.now()
-            return True
-        else:
-            raise Exception(f"Erro ao renovar token: {response.status_code} {response.text}")
-
     def calculate_shipping(self, user):
-        valid = self.check_token(user.is_superuser)
-        if(valid != True):
-            raise Exception(valid)
+        self.check_token(user.is_superuser)
         payload = {
             "from": { "postal_code": f"{settings.ADMIN_CEP}" },
             "to": { "postal_code": f"{user.cep}" },
@@ -121,9 +69,7 @@ class MelhorEnvioAPI:
             raise Exception(f'Falha ao calcular frete. Código: {response.status_code}. Corpo: {response.json()}')
 
     def add_to_cart(self, user):
-        valid = self.check_token(user.is_superuser)
-        if(valid != True):
-            raise Exception(valid)
+        self.check_token(user.is_superuser)
         cep = user.cep.replace("-", "")
         address = requests.get(f"https://viacep.com.br/ws/{cep}/json").json()
         payload = {
@@ -150,7 +96,7 @@ class MelhorEnvioAPI:
                 "email": f"{user.email}",
                 "document": f"{user.cpf}",
                 "address": address['logradouro'],
-                "complement": f"{user.complement}",
+                "complement": f"{user.complement or 'none'}",
                 "number": f"{user.home_number}",
                 "district": address['bairro'],
                 "city": address['localidade'],
@@ -203,9 +149,7 @@ class MelhorEnvioAPI:
         }
         response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
-        if response.status_code < 400:
-            return response.json()
-        raise Exception("Failed to create shipment" + response.text)
+        return response.json()
 
     def buy_shipments(self, id):
         url=f"{self.api_url}/me/shipment/checkout"
@@ -243,10 +187,8 @@ class MelhorEnvioAPI:
         raise Exception("Failed to generate labels" + response.text)
 
     def track_shipment(self, user, shipmentId):
-        valid = self.check_token(user.is_superuser)
-        if(valid != True):
-            raise Exception(valid)
-        url=f"{self.api_url}/me/shipment/track/{shipmentId}"
+        self.check_token(user.is_superuser)
+        url = f"{self.api_url}/me/shipment/track/{shipmentId}"
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -260,6 +202,7 @@ class MelhorEnvioAPI:
             return response.json()
         raise Exception("Failed to track shipment" + response.text)
 
+
 async def generate_pdf_from_url(url, token=None):
     browser = await launch(
         headless=True,
@@ -267,7 +210,7 @@ async def generate_pdf_from_url(url, token=None):
         executablePath='/usr/bin/chromium-browser',
     )
     page = await browser.newPage()
-    if(token):
+    if token:
         headers = {"Authorization": f"Bearer {token}"}
         await page.setExtraHTTPHeaders(headers)
     await page.goto(url, {"waitUntil": "networkidle2"})

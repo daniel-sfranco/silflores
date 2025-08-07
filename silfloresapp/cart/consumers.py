@@ -1,8 +1,9 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer #type:ignore
+from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Message, Cart
 from users.models import CustomUser
 from asgiref.sync import sync_to_async
+
 
 class Order(AsyncWebsocketConsumer):
     async def connect(self):
@@ -15,7 +16,6 @@ class Order(AsyncWebsocketConsumer):
 
         await self.accept()
         print(f"Usuário conectado ao chat {self.room_name}")
-
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -42,5 +42,5 @@ class Order(AsyncWebsocketConsumer):
         cartUser = self.room_name.split("-")[0]
         cart = await sync_to_async(Cart.objects.get)(user__username=cartUser)
         sender = await sync_to_async(CustomUser.objects.get)(username=senderUsername)
-        messageObject = await sync_to_async(Message.objects.create)(content=messageProcessed, cart=cart, sender=sender)
+        messageObject = await sync_to_async(Message.objects.create)(content=messageProcessed, cart=cart, sender=sender)  # noqa: F841
         await self.send(text_data=json.dumps({'message': message}))

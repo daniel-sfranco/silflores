@@ -2,6 +2,7 @@ from django.db import models
 from users.models import CustomUser
 from products.models import Product
 
+
 # Create your models here.
 class Cart(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -12,8 +13,8 @@ class Cart(models.Model):
     freightOption = models.IntegerField(default=0)
     freightValue = models.DecimalField(default=0, decimal_places=2, max_digits=6)
     paymentUrl = models.CharField(default='')
-    labelUrl = models.CharField(default='')
-    trackingUrl = models.CharField(default='')
+    labelUrl = models.CharField(default='', null=True)
+    trackingUrl = models.CharField(default='', null=True)
     checkoutCreation = models.DateTimeField(null=True)
     paymentDatetime = models.DateTimeField(null=True)
     shipmentId = models.CharField(null=True)
@@ -53,10 +54,9 @@ class Coupon(models.Model):
     type = models.CharField(choices=types, verbose_name="Tipo")
     value = models.DecimalField(decimal_places=2, max_digits=6)
 
+
 class MelhorEnvioToken(models.Model):
     access_token = models.TextField(blank=True)
-    refresh_token = models.TextField(blank=True, null=True)
-    expires_in = models.IntegerField()
-    updated_at = models.DateTimeField(auto_now=True)
+    expires_in = models.DateTimeField()
     prev_url = models.CharField(max_length=255, blank=True)
     sandbox = models.BooleanField(default=False)

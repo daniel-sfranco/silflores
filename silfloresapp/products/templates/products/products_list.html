@@ -46,7 +46,7 @@
             </div>
         </div>
         {% if user.is_authenticated and user.is_superuser %}
-            <button id="newProduct">Novo produto</button>
+            <button id="newProduct" style="margin:1rem; padding:0.5rem;">Novo produto</button>
             <script>
                 document.getElementById("newProduct").onclick = function(){
                     window.location.href = "/products/new-product/"

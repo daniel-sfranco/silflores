@@ -1,24 +1,21 @@
 import json
-import asyncio
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from django.conf import settings
-from asgiref.sync import async_to_sync
-from pyppeteer import launch #type:ignore
 from users.models import CustomUser
 from .models import Cart, CartItem, Message, MelhorEnvioToken
 from products.models import Product
 from .pagseguro_service import PagSeguroAPI
-from .melhorenvio_service import MelhorEnvioAPI, generate_pdf_from_url
+from .melhorenvio_service import MelhorEnvioAPI
 
 
 @login_required(login_url="/user/login")
 def cart_page(request, username):
     actUser = CustomUser.objects.get(username=request.user.username)
-    if(not actUser.is_superuser and actUser.username != username):
+    if not actUser.is_superuser and actUser.username != username:
         return redirect(f'/cart/{request.user.username}/page')
     cart = Cart.objects.get(user__username=username)
     items = [cartitem for cartitem in cart.items.order_by('-product__name')]
@@ -27,18 +24,27 @@ def cart_page(request, username):
     for item in items:
         numProducts += item.quantity
         fullPrice += item.fullPrice
-    if(cart.fullPrice != fullPrice or cart.products != numProducts):
+    if cart.fullPrice != fullPrice or cart.products != numProducts:
         cart.fullPrice = fullPrice
         cart.products = numProducts
         cart.save()
-    if(cart.checkoutCreation):
+    if cart.checkoutCreation:
         diff = timezone.now() - cart.checkoutCreation
-        if(cart.status == 'closed' and (diff.days > 0 or diff.seconds // 3600 >= 2)):
+        if cart.status == 'closed' and \
+                (diff.days > 0 or diff.seconds // 3600 >= 2):
             cart.status = 'open'
             cart.save()
     cartUser = {'name': cart.user.name, 'username': cart.user.username}
     messages = Message.objects.filter(cart=cart).order_by("datetime")
-    return render(request, 'cart/cart_page.html', {'cartUser': cartUser, 'cart': cart, 'items': items, 'user': actUser, 'messages': messages, 'debug':settings.DEBUG})
+    return render(request, 'cart/cart_page.html',
+                  {
+                    'cartUser': cartUser,
+                    'cart': cart,
+                    'items': items,
+                    'user': actUser,
+                    'messages': messages,
+                    'debug': settings.DEBUG
+                  })
 
 
 @login_required(login_url='/user/login')
@@ -104,7 +110,7 @@ def cart_deleteItem(request, pk):
 @user_passes_test(lambda u: u.is_superuser)
 def cart_orders(request):
     try:
-        melhorEnvioObject = MelhorEnvioAPI(request.user.is_superuser)
+        MelhorEnvioAPI(request.user.is_superuser)
     except Exception as e:
         print(e.args[0])
         if("melhorenvio" in str(e)):
@@ -138,12 +144,12 @@ def get_messages(request, username):
 @login_required(login_url='/user/login')
 def confirm_purchase(request, username):
     user = CustomUser.objects.get(username=username)
-    if(user.username == username):
+    if user.username == username:
         try:
             MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
         except Exception as e:
             print(e.args[0])
-            if("melhorenvio" in str(e)):
+            if "melhorenvio" in str(e):
                 instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
                 instance.prev_url = request.path
                 instance.save()
@@ -202,19 +208,22 @@ def thanks(request):
     cart.paymentDatetime = timezone.now()
     cart.save()
     MelhorEnvioObject = 0
-    insertResponse = buyResponse = generateResponse = {'id':''}
+    insertResponse = generateResponse = {'id': ''}
     try:
         MelhorEnvioObject = MelhorEnvioAPI(user.is_superuser)
         insertResponse = MelhorEnvioObject.add_to_cart(user)
-        buyResponse = MelhorEnvioObject.buy_shipments(insertResponse['id'])
-        generateResponse = MelhorEnvioObject.generate_labels(insertResponse['id'])
+        MelhorEnvioObject.buy_shipments(insertResponse['id'])
+        generateResponse = MelhorEnvioObject.generate_labels(
+            insertResponse['id']
+        )
     except Exception as e:
-        if("melhorenvio" in str(e)):
-            instance = MelhorEnvioToken.objects.get(sandbox=settings.MELHOR_ENVIO_SANDBOX)
+        if "melhorenvio" in str(e):
+            instance = MelhorEnvioToken.objects.get(
+                sandbox=settings.MELHOR_ENVIO_SANDBOX
+            )
             instance.prev_url = request.path
             instance.save()
             return redirect(e.args[0])
-    #user.cart.status = "ticket"
     cart.shipmentId = insertResponse['id']
     cart.labelUrl = generateResponse.get('url')
     cart.save()
@@ -230,4 +239,5 @@ def thanks(request):
 def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
     url = user.cart.labelUrl
+    user.cart.status = "ticket"
     return JsonResponse({"url": url})

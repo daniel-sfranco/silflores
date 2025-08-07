@@ -32,6 +32,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', '1')))
 
+PRODUCTION_URL = "https://silflores.fly.dev"
+
 PAGSEGURO_SANDBOX = bool(int(os.getenv('PAGSEGURO_SANDBOX', 1)))
 PAGSEGURO_EMAIL = os.getenv('PAGSEGURO_EMAIL', 'CHANGE-ME')
 PAGSEGURO_TOKEN = os.getenv('PAGSEGURO_TOKEN', 'CHANGE-ME')

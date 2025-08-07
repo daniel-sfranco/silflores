@@ -1,5 +1,6 @@
-import requests #type:ignore
+import requests
 from django.conf import settings
+
 
 class PagSeguroAPI:
     BASE_URL = (
@@ -40,7 +41,7 @@ class PagSeguroAPI:
                     "region_code": address["uf"],
                     "country": "BRA",
                     "postal_code": user.cep,
-                    "complement": user.complement,
+                    "complement": user.complement or "Não se aplica",
                     "locality": address["bairro"]
                 },
                 "box": {
@@ -58,7 +59,11 @@ class PagSeguroAPI:
             "customer_modifiable": True,
             "reference_id": cart.id,
             "items": [],
-            "payment_methods": [{ "type": "CREDIT_CARD" }, { "type": "DEBIT_CARD" }, { "type": "BOLETO" }, { "type": "PIX" }],
+            "payment_methods": [
+                {"type": "CREDIT_CARD"},
+                {"type": "DEBIT_CARD"},
+                {"type": "BOLETO"},
+                {"type": "PIX"}],
         }
         if settings.DEBUG:
             data['redirect_url'] = f'{settings.NGROK_URL}/cart/thanks'
@@ -73,10 +78,8 @@ class PagSeguroAPI:
             item['image_url'] = cartitem.product.firstPhoto.url
             data['items'].append(item)
         response = requests.post(url, headers=headers, json=data)
-        try:
-            response.raise_for_status()
-        except:
-            print(response.json())
+        print(response.json())
+        response.raise_for_status()
         return response.json()
 
     def get_transaction_details(transaction_code):
