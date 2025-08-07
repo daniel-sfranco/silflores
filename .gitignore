@@ -2,6 +2,7 @@ gunicorn-error-log
 __localcode
 notes/
 .env
+data
 ./dotenv_files/.env
 /dotenv_files/.env
 dotenv_files/.env
