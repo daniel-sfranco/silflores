@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% load static %}
+{% load django_vite %}
 
 {% block title %}
     Cart
@@ -61,9 +61,9 @@
         {% elif cart.status == 'paid' %}
             <p>Status: Pago</p>
             <button id="generateTicket" data-user={{cartUser.username}} data-name="{{cartUser.name}}">Gerar etiqueta</button>
-            <script src="{% static "js/generate_ticket.js" %}"></script>
+            {% vite_asset 'src/js/generate_ticket.js' %}
         {% endif %}
     {% endif %}
-    <script src="{% static 'js/set_quantity.js' %}"></script>
-    <script src="{% static "js/websocket.js" %}"></script>
+    {% vite_asset 'src/js/set_quantity.js' %}
+    {% vite_asset "src/js/websocket.js" %}
 {% endblock content %}

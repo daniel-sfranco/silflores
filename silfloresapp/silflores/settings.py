@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'daphne',
     'django.contrib.staticfiles',
     'channels',
+    'django_vite', # Adicionado para integração com Vite
     'cart',
     'products',
     'users',
@@ -209,7 +210,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    BASE_DIR / "static",
+    BASE_DIR / "static" / "dist",
 ]
 STATIC_ROOT = os.path.join(DATA_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -253,3 +255,12 @@ ADMIN_CITY = os.getenv("ADMIN_CITY", "CHANGE-ME")
 ADMIN_UF = os.getenv("ADMIN_UF", "CHANGE-ME")
 ADMIN_COUNTRY = os.getenv("ADMIN_COUNTRY", "CHANGE-ME")
 ADMIN_CEP = os.getenv('ADMIN_CEP', 'change-me')
+
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": DEBUG,
+        "dev_server_host": "localhost",
+        "dev_server_port": 5173,
+        "manifest_path": BASE_DIR / "static" / "dist" / "manifest.json",
+    }
+}

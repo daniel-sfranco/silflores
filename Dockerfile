@@ -1,8 +1,26 @@
+FROM node:alpine as frontend-builder
+
+WORKDIR /app
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+# Copy the entire silfloresapp directory
+COPY silfloresapp /app/silfloresapp
+COPY vite.config.js /app/vite.config.js
+
+# Run Vite build, using the config file
+RUN npm run build -- --config /app/vite.config.js
+
+# Debugging commands in frontend-builder stage
+RUN echo "Contents of /app/silfloresapp/static/ after Vite build:" && ls -l /app/silfloresapp/static/ &&     echo "Contents of /app/silfloresapp/static/dist/ after Vite build:" && ls -l /app/silfloresapp/static/dist/
+
 FROM python:alpine3.21
+
 LABEL maintainer="danielsfranco346@gmail.com"
 
 ENV PYTHONDONTWRITEBYTECODE 1
-
 ENV PYTHONUNBUFFERED 1
 
 COPY silfloresapp /silfloresapp
@@ -39,6 +57,9 @@ RUN python -m venv /venv && \
   rm -rf /var/cache/apk/* && \
   curl -o /cloud_sql_proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.6.1/cloud-sql-proxy.linux.amd64 && \
   chmod +x /cloud_sql_proxy
+
+# Copy built frontend assets from the frontend-builder stage
+COPY --from=frontend-builder /app/silfloresapp/static/dist /silfloresapp/static/dist
 
 ENV PATH="/scripts:/venv/bin:$PATH"
 

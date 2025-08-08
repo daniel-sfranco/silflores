@@ -14,4 +14,4 @@ echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)
 
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
-daphne silflores.asgi:application --bind 127.0.0.1 --port 8000
+daphne silflores.asgi:application --bind 0.0.0.0 --port 8000

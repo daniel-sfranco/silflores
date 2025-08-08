@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% load static %}
+{% load django_vite %}
 
 {% block title %}
     Confirmar compra
@@ -28,5 +28,5 @@
     </table>
     <input type="hidden" id="data" data-user="{{user.username}}">
     <button id='finishPurchase'>Finalizar compra</button>
-    <script src="{% static 'js/finish_purchase.js' %}"></script>
+    {% vite_asset 'src/js/finish_purchase.js' %}
 {% endblock content %}

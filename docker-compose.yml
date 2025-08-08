@@ -14,10 +14,10 @@ services:
     depends_on:
       - psql
       - redis
-    develop:
-      watch:
-        - action: rebuild
-          path: ./silfloresapp
+    
+    
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   psql:
     container_name: psql
     image: postgres:13-alpine

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% load static %}
+{% load django_vite %}
 
 {% block title %}
 Login
@@ -18,5 +18,5 @@ Login
         <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
     </form>
     <button onclick="redirect_register()" class="form-submit">Register</button>
-    <script src="{% static "js/register_redirect.js" %}"></script>
+    {% vite_asset "src/js/register_redirect.js" %}
 {% endblock %}

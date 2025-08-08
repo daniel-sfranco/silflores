@@ -63,3 +63,4 @@ xmltodict==0.14.2
 yarl==1.19.0
 zipp==3.21.0
 zope.interface==7.2
+django-vite==3.0.0
