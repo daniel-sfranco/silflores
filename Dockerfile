@@ -20,8 +20,9 @@ FROM python:alpine3.21
 
 LABEL maintainer="danielsfranco346@gmail.com"
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+ENV PYTHONUNBUFFERED=1
 
 COPY silfloresapp /silfloresapp
 COPY scripts /scripts

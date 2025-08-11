@@ -14,8 +14,6 @@ services:
     depends_on:
       - psql
       - redis
-    
-    
     extra_hosts:
       - "host.docker.internal:host-gateway"
   psql:
