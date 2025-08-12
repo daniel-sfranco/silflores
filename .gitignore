@@ -3,6 +3,7 @@ __localcode
 notes/
 .env
 data
+data/
 ./dotenv_files/.env
 /dotenv_files/.env
 dotenv_files/.env
