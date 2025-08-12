@@ -1,4 +1,4 @@
-FROM node:alpine as frontend-builder
+FROM node:alpine AS frontend-builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN npm run build -- --config /app/vite.config.js
 # Debugging commands in frontend-builder stage
 RUN echo "Contents of /app/silfloresapp/static/ after Vite build:" && ls -l /app/silfloresapp/static/ &&     echo "Contents of /app/silfloresapp/static/dist/ after Vite build:" && ls -l /app/silfloresapp/static/dist/
 
-FROM python:alpine3.21
+FROM python:3.12-alpine
 
 LABEL maintainer="danielsfranco346@gmail.com"
 
@@ -66,6 +66,7 @@ ENV PATH="/scripts:/venv/bin:$PATH"
 
 USER root
 
+ENV COLLECTSTATIC_BUILD=1
 RUN python manage.py collectstatic --noinput
 
 CMD ["commands.sh"]

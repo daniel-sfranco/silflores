@@ -5,17 +5,15 @@ export default defineConfig({
   base: '/static/',
   build: {
     manifest: true,
-    outDir: 'dist',
-    rollupOptions: {
-      input: {
-        main: 'src/js/main.js',
-        home_carousel: 'src/js/home_carousel.js',
-      },
-    },
+    outDir: 'silfloresapp/static/dist',
   },
   server: {
     host: '0.0.0.0',
     port: 5173,
-    cors: true,
+    cors: {
+      origin: 'http://localhost:8000',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    },
   },
 });

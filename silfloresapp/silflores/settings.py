@@ -52,6 +52,13 @@ ALLOWED_HOSTS = [
     "*"
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
+
 NGROK_URL = os.getenv('NGROK_URL', 'change-me')
 
 CSRF_TRUSTED_ORIGINS = [
@@ -73,6 +80,7 @@ INSTALLED_APPS = [
     'daphne',
     'django.contrib.staticfiles',
     'channels',
+    'corsheaders',
     'django_vite', # Adicionado para integração com Vite
     'cart',
     'products',
@@ -85,6 +93,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -211,10 +220,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "static" / "dist",
 ]
 STATIC_ROOT = os.path.join(DATA_DIR, 'static')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = (
+    "django.contrib.staticfiles.storage.StaticFilesStorage"
+    if os.getenv("COLLECTSTATIC_BUILD")
+    else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
