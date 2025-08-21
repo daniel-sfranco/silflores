@@ -15,12 +15,4 @@ echo "✅ Postgres Database Started Successfully ($POSTGRES_HOST:$POSTGRES_PORT)
 python manage.py makemigrations --noinput
 python manage.py collectstatic --noinput
 
-echo "Listing contents of /silfloresapp/static/dist:"
-ls -lR /silfloresapp/static/dist
-
-echo "Listing contents of /silfloresapp/static/img:"
-ls -lR /silfloresapp/static/img
-
-echo "Listing contents of /data/web/static:"
-ls -lR /data/web/static
 daphne silflores.asgi:application --bind 0.0.0.0 --port 8000

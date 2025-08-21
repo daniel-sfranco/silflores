@@ -8,7 +8,6 @@ data/
 /dotenv_files/.env
 dotenv_files/.env
 silflores-proxy-key.json
-monitor.sh
 monitor.fish
 
 

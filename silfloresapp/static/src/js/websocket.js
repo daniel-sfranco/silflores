@@ -4,12 +4,12 @@ const cartUser = document.getElementById("data").getAttribute("data-con");
 const actUser = document.getElementById("data").getAttribute("data-user");
 let debug = document.getElementById("data").getAttribute("data-debug");
 let ws = 0
-console.log(debug)
+
 if(debug == "0" || debug == 0 || debug == 'False'){
     debug = false
 }
 if(debug){
-    ws = new WebSocket(`wss://${wsUrl.host}/ws/chat/${cartUser}-cart`);
+    ws = new WebSocket(`ws://${wsUrl.host}/ws/chat/${cartUser}-cart`);
 } else {
     ws = new WebSocket(`wss://${wsUrl.host}/ws/chat/${cartUser}-cart`);
 }
@@ -86,6 +86,7 @@ document.getElementById("send-message").addEventListener("click", () => {
 
 document.getElementById("message-input").addEventListener("keyup", ({ key }) => {
     if (key === "Enter") {
+        console.log(messageInput.value)
         sendMessage(messageInput.value, actUser);
         messageInput.value = "";
         messageInput.click()

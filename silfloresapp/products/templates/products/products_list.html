@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% load static %}
 
-{% load django_vite %}
+
 
 {% block title%}
     Produtos
@@ -67,5 +68,5 @@
         </ul>
     </section>
 
-    {% vite_asset "src/js/products_list.js" %}
+    <script src="{% static "src/js/products_list.js" %}"></script>
 {% endblock%}

@@ -4,8 +4,6 @@ const user = document.getElementById("data").getAttribute("data-user");
 finishButton.onclick = function() {
     const freightOption = document.querySelector('input[name="freight_options"]:checked')
     const freightValue = document.getElementById(freightOption.value)
-    console.log(freightOption.value)
-    console.log(freightValue.innerText)
     fetch(`/cart/${user}/processPayment`, {
         method: "POST",
         headers: {

@@ -53,7 +53,6 @@ fetch(`/products/getProductJson/${data.getAttribute('data-slug')}`)
 .then(data => {
     photos = data.photos;
     numPhotos = data.numPhotos;
-    console.log(photos);
     setCarousel(
         photos,
         numPhotos,

@@ -20,7 +20,6 @@ addButton.onclick = function(){
             } else {
                 actUrl = new URL(window.location.href)
                 window.location.href = `/user/login/?next=${actUrl.pathname}`;
-                console.log(actUrl.pathname)
             }
         } else {
             console.error("Erro ao adicionar ao carrinho:", response.status, response.statusText);

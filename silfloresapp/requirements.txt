@@ -1,14 +1,12 @@
 asgiref==3.8.1
 beautifulsoup4==4.12.3
 certifi==2024.7.4
-channels==4.0.0
 channels-redis==4.2.0
 charset-normalizer==3.3.2
 cloudinary==1.40.0
 daphne==4.1.2
 Django==5.0.7
 django-cloudinary-storage==0.3.0
-django-vite==3.0.2
 idna==3.7
 msgpack==1.0.8
 psycopg2-binary==2.9.9

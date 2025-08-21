@@ -16,6 +16,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,6 +32,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(os.getenv('DEBUG', '1')))
+
+NGROK_FRONTEND_URL = os.getenv('NGROK_FRONTEND_URL', '')
 
 PRODUCTION_URL = "https://silflores.fly.dev"
 
@@ -52,10 +55,10 @@ ALLOWED_HOSTS = [
     "*"
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
+CORS_ALLOWED_ORIGINS = []
+
+if NGROK_FRONTEND_URL:
+    CORS_ALLOWED_ORIGINS.append(NGROK_FRONTEND_URL)
 
 CORS_ALLOW_ALL_ORIGINS = False
 
@@ -81,7 +84,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'corsheaders',
-    'django_vite', # Adicionado para integração com Vite
     'cart',
     'products',
     'users',
@@ -269,11 +271,4 @@ ADMIN_UF = os.getenv("ADMIN_UF", "CHANGE-ME")
 ADMIN_COUNTRY = os.getenv("ADMIN_COUNTRY", "CHANGE-ME")
 ADMIN_CEP = os.getenv('ADMIN_CEP', 'change-me')
 
-DJANGO_VITE = {
-    "default": {
-        "dev_mode": DEBUG,
-        "dev_server_host": "localhost",
-        "dev_server_port": 5173,
-        "manifest_path": BASE_DIR / "static" / "dist" / "manifest.json",
-    }
-}
+

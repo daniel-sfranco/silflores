@@ -1,7 +1,5 @@
 {% extends 'layout.html' %}
-
 {% load static %}
-{% load django_vite %}
 
 {% block title%}
     Home
@@ -40,6 +38,6 @@
         </div>
     </div>
 
-   {% vite_asset "src/js/home_carousel.js" %}
+   <script src="{% static "src/js/home_carousel.js" %}"></script>
 
 {% endblock %}

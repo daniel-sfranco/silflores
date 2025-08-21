@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% load static %}
 
-{% load django_vite %}
+
 
 {% block title %}
 Seu perfil
@@ -29,6 +30,6 @@ Seu perfil
                 </div>
             </div>
         </div>
-        {% vite_asset 'src/js/confirm_delete.js' %}
+        <script src="{% static 'src/js/confirm_delete.js' %}"></script>
     {% endif %}
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% load static %}
 
-{% load django_vite %}
+
 
 {% block title%}
     {{product.name}}
@@ -58,11 +59,11 @@
                 </div>
             </div>
         </div>
-        {% vite_asset 'src/js/confirm_delete.js' %}
+        <script src="{% static 'src/js/confirm_delete.js' %}"></script>
     {% else %}
         <button class="form-submit" id="btnAddCart" data-slug="{{product.slug}}">Adicionar ao carrinho</button>
-        {% vite_asset "src/js/product_page.js" %}
+        <script src="{% static 'src/js/product_page.js' %}"></script>
     {% endif %}
 
-    {% vite_asset "src/js/product_photo_carousel.js" %}
+    <script src="{% static "src/js/product_photo_carousel.js" %}"></script>
 {% endblock%}

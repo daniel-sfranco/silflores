@@ -2,19 +2,13 @@ FROM node:alpine AS frontend-builder
 
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+# Copy package files first for better layer caching
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Copy the entire silfloresapp directory
-COPY silfloresapp /app/silfloresapp
-COPY vite.config.js /app/vite.config.js
+# Copy the rest of the application code
+COPY . .
 
-# Run Vite build, using the config file
-RUN npm run build -- --config /app/vite.config.js
-
-# Debugging commands in frontend-builder stage
-RUN echo "Contents of /app/silfloresapp/static/ after Vite build:" && ls -l /app/silfloresapp/static/ &&     echo "Contents of /app/silfloresapp/static/dist/ after Vite build:" && ls -l /app/silfloresapp/static/dist/
 
 FROM python:3.12-alpine
 
@@ -26,7 +20,7 @@ ENV PYTHONUNBUFFERED=1
 
 COPY silfloresapp /silfloresapp
 COPY scripts /scripts
-COPY --from=redis:7-alpine3.20 /usr/local/bin/redis-cli /usr/local/bin/redis-cli
+COPY --from=redis:7-alpine /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 COPY silflores-proxy-key.json /silflores-proxy-key.json
 COPY cloud-sql-proxy /cloud-sql-proxy
 
@@ -58,9 +52,6 @@ RUN python -m venv /venv && \
   rm -rf /var/cache/apk/* && \
   curl -o /cloud_sql_proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.6.1/cloud-sql-proxy.linux.amd64 && \
   chmod +x /cloud_sql_proxy
-
-# Copy built frontend assets from the frontend-builder stage
-COPY --from=frontend-builder /app/silfloresapp/static/dist /silfloresapp/static/dist
 
 ENV PATH="/scripts:/venv/bin:$PATH"
 

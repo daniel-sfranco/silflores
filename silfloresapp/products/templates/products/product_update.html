@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
-
-{% load django_vite %}
+{% load static %}
 
 {% block title %}
 Atualizar Produto
@@ -45,6 +44,7 @@ Atualizar Produto
         {{ product_form.as_p }}
         <button class="form-submit">Atualizar</button>
     </form>
-    {% vite_asset 'src/js/product_photo_carousel.js' %}
-    {% vite_asset 'src/js/product_photo_visualization.js' %}
+
+    <script src="{% static 'src/js/product_photo_carousel.js' %}"></script>
+    <script src="{% static 'src/js/product_photo_visualization.js' %}"></script>
 {% endblock content %}

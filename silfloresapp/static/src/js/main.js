@@ -1,5 +1,3 @@
-import '../css/style.css';
-
 const searchInput = document.getElementById('product-search')
 const searchButton = document.getElementById('search-button')
 const csrftoken = document.querySelector('[name="csrfmiddlewaretoken"]').value;

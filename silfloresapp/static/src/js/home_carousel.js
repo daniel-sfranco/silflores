@@ -36,7 +36,6 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
                     <p class="card-text">${elements[elementCounter].desc}</p>
                 </div>`;
                 card.onclick = function () {
-                    console.log(card.dataset.name);
                     let url = card.dataset.name;
                     if (urlPrefix) {
                         url = urlPrefix + url;

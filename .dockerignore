@@ -23,3 +23,12 @@ stats
 Dockerfile
 __localcode/
 notes/
+
+# Database data
+data/
+
+# Python virtual environment
+venv/
+
+# Node.js dependencies
+node_modules/

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% load django_vite %}
+{% load static %}
 
 {% block title %}
 Login
@@ -18,5 +18,16 @@ Login
         <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
     </form>
     <button onclick="redirect_register()" class="form-submit">Register</button>
-    {% vite_asset "src/js/register_redirect.js" %}
+
+    <script>
+         function redirect_register(){
+            const nextUrl = new URL(window.location.href);
+            const next = nextUrl.searchParams.get('next');
+            if(next){
+                window.location.href = '/user/register/?next=' + encodeURIComponent(next);
+            } else {
+                window.location.href = '/user/register/'
+            }
+        }
+    </script>
 {% endblock %}
