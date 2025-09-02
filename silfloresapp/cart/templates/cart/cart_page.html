@@ -50,9 +50,12 @@
         {% elif cart.status == 'closed' %}
             <a href="{{cart.paymentUrl}}">Finalizar pagamento</a>
         {% elif cart.status == 'paid' %}
-            <p>Pagamento feito em {{cart.paymentDatetime}}. Seu pedido será enviado em breve.</p>
+            <p>Pagamento feito em {{cart.paymentDatetime}}. Seu pedido está sendo produzido.</p>
+        {% elif cart.status == 'ticket' %}
+            <p>Seu pedido está pronto, e em breve será enviado</p>
         {% elif cart.status == 'sent' %}
-            <a href="{{cart.trackingUrl}}">Verifique o rastreio do seu pedido aqui</a>
+            <button id="trackShipment" data-user={{cartUser.username}}>Verifique o rastreio do seu pedido aqui</button>
+            <script src="{% static 'src/js/track_shipment.js'%}"></script>
         {% endif %}
     {% else %}
         {% if cart.status == 'closed' %}
@@ -61,6 +64,14 @@
             <p>Status: Pago</p>
             <button id="generateTicket" data-user={{cartUser.username}} data-name="{{cartUser.name}}">Gerar etiqueta</button>
             <script src="{% static 'src/js/generate_ticket.js' %}"></script>
+        {% elif cart.status == 'ticket' %}
+            <p>Status: Etiqueta gerada</p>
+            <button id="sentShipment">Marcar como enviado</button>
+            <button id="generateTicket" data-user={{cartUser.username}} data-name="{{cartUser.name}}">Gerar etiqueta novamente</button>
+            <script src="{% static 'src/js/generate_ticket.js' %}"></script>
+        {% elif cart.status == 'sent' %}
+            <button id="trackShipment" data-user={{cartUser.username}}>Verifique o rastreio do seu pedido aqui</button>
+            <script src="{% static 'src/js/track_shipment.js'%}"></script>
         {% endif %}
     {% endif %}
     <script src="{% static "src/js/set_quantity.js" %}"></script>

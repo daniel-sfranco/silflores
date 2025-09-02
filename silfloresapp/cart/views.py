@@ -240,4 +240,25 @@ def get_ticket(request, username):
     user = CustomUser.objects.get(username=username)
     url = user.cart.labelUrl
     user.cart.status = "ticket"
+    user.cart.save()
     return JsonResponse({"url": url})
+
+
+@login_required(login_url="/user/login")
+@user_passes_test(lambda u: u.is_superuser)
+def set_sent(request, username):
+    user = CustomUser.objects.get(username=username)
+    user.cart.status = "sent"
+    user.cart.save()
+    return JsonResponse({"Response": "Success"})
+
+ 
+@login_required(login_url="/user/login")
+def track_shipment(request, username):
+    MelhorEnvioObject = MelhorEnvioAPI(request.user.is_superuser)
+    user = CustomUser.objects.get(username=username)
+    shipmentId = user.cart.shipmentId
+    trackingData = MelhorEnvioAPI.track_shipment(MelhorEnvioObject, user, shipmentId)
+    user.cart.trackingUrl = f'https://melhorrastreio.com.br/rastreio/{trackingData["tracking"]}'
+    return JsonResponse({"cart": user.cart})
+

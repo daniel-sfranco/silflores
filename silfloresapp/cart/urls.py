@@ -15,4 +15,6 @@ urlpatterns = [
     path('<str:username>/confirm/', views.confirm_purchase, name='confirm'),
     path('thanks', views.thanks, name='thanks'),
     path('<str:username>/getTicket', views.get_ticket, name='getTicket'),
+    path('<str:username>/setSent', views.set_sent, name='setSent'),
+    path('<str:username>/track', views.track_shipment, name='trackShipment'),
 ]
