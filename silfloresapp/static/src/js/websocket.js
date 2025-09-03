@@ -54,6 +54,7 @@ ws.onopen = () => {
                 })
             }
         })
+        .catch(error => console.error('Erro ao buscar mensagens do chat:', error));
     }
     console.log("Conexão WebSocket estabelecida");
 };

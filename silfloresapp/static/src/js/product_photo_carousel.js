@@ -58,4 +58,5 @@ fetch(`/products/getProductJson/${data.getAttribute('data-slug')}`)
         numPhotos,
         "photo-carousel",
     );
-});
+})
+.catch(error => console.error('Erro ao buscar fotos do produto:', error));

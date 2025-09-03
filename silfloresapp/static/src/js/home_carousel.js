@@ -1,6 +1,17 @@
 function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
     const carousel = document.getElementById(carouselId);
     const innerCarousel = carousel.querySelector(".carousel-inner");
+
+    // Bug 1 Fix: Set the target for the controls to this specific carousel instance
+    const prevButton = carousel.querySelector('.carousel-control-prev');
+    const nextButton = carousel.querySelector('.carousel-control-next');
+    if (prevButton) {
+        prevButton.setAttribute('data-bs-target', `#${carouselId}`);
+    }
+    if (nextButton) {
+        nextButton.setAttribute('data-bs-target', `#${carouselId}`);
+    }
+
     const width = window.screen.width;
     let elementsPerRow = 4;
     if (width < 576) {
@@ -28,7 +39,8 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
                 actElement.setAttribute("style", `order: ${elementCounter}`);
                 const card = document.createElement("div");
                 card.setAttribute("class", "card");
-                card.setAttribute("data-name", elements[elementCounter].name);
+                // Bug 2 Fix: Set data-slug instead of data-name
+                card.setAttribute("data-slug", elements[elementCounter].slug);
                 card.innerHTML = `
                 <img src="${elements[elementCounter].imageUrl}" class="card-img-top" alt="${elements[elementCounter].name} image">
                 <div class="card-body">
@@ -36,14 +48,15 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
                     <p class="card-text">${elements[elementCounter].desc}</p>
                 </div>`;
                 card.onclick = function () {
-                    let url = card.dataset.name;
+                    // Bug 2 Fix: Use data-slug for the URL
+                    let url = card.dataset.slug;
                     if (urlPrefix) {
                         url = urlPrefix + url;
                     }
                     if (urlSufix) {
                         url = url + urlSufix;
                     }
-                    window.location.href = url.toLowerCase();
+                    window.location.href = url;
                 };
                 actElement.appendChild(card);
                 innerRow.appendChild(actElement);
@@ -60,34 +73,23 @@ function setCarousel(elements, numElements, carouselId, urlPrefix, urlSufix) {
     }
 }
 
-let soldProducts = 0;
-let numSoldProducts = 0;
-fetch("/getSoldProducts/")
-.then((response) => response.json())
-.then((data) => {
-    soldProducts = JSON.parse(data.soldProducts);
-    numSoldProducts = data.numSoldProducts;
-    setCarousel(
-        soldProducts,
-        numSoldProducts,
-        "sold",
-        "/products/",
-        false
-    );
-});
+function setupCarousel(fetchUrl, carouselId, errorMsg, productsKey, numProductsKey) {
+    fetch(fetchUrl)
+        .then((response) => response.json())
+        .then((data) => {
+            const products = JSON.parse(data[productsKey]);
+            console.log(products);
+            const numProducts = data[numProductsKey];
+            setCarousel(
+                products,
+                numProducts,
+                carouselId,
+                "/products/",
+                false
+            );
+        })
+        .catch(error => console.error(errorMsg, error));
+}
 
-let newProducts = 0;
-let numNewProducts = 0;
-fetch("/getNewProducts/")
-.then((response) => response.json())
-.then((data) => {
-    newProducts = JSON.parse(data.newProducts);
-    numNewProducts = data.numNewProducts;
-    setCarousel(
-        newProducts,
-        numNewProducts,
-        "new",
-        "/products/",
-        false
-    );
-});
+setupCarousel("/getSoldProducts/", "sold", "Erro ao buscar produtos vendidos:", "soldProducts", "numSoldProducts");
+setupCarousel("/getNewProducts/", "new", "Erro ao buscar novos produtos:", "newProducts", "numNewProducts");

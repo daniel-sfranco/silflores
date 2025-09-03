@@ -147,6 +147,10 @@ td {
     border: none;
 }
 
+.card:hover, #sec_logo:hover {
+    cursor: pointer;
+}
+
 .card > h5 {
     padding: 0.5rem;
 }

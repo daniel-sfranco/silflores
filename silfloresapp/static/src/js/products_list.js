@@ -57,8 +57,10 @@ for(let j = 0; j < tagLabels.length; j++){
     }
 }
 
-filterButton.onclick = function() {
-    dropdownContent.classList.toggle("showDropdown")
+if (filterButton) {
+    filterButton.addEventListener('click', function() {
+        dropdownContent.classList.toggle("showDropdown");
+    });
 }
 
 window.onclick = function(event) {
@@ -153,12 +155,5 @@ function filter() {
 productCards.forEach((card) => {
     card.addEventListener('click', function() {
         window.location.href = card.querySelector('a').href;
-    })
-    card.addEventListener('mouseover', function() {
-        card.style.cursor = 'pointer';
-    }
-    )
-    card.addEventListener('mouseout', function() {
-        card.style.cursor = 'auto';
     })
 })

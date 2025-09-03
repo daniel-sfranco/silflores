@@ -5,20 +5,26 @@ const btnConfirm = document.getElementById('deleteConfirm');
 const span = document.getElementsByClassName("close")[0];
 const deleteUrl = btnConfirm.dataset.deleteUrl;
 
-btnDelete.onclick = function() {
-    modalDelete.style.display = "block";
+if (btnDelete) {
+    btnDelete.addEventListener('click', function() {
+        modalDelete.style.display = "block";
+    });
 }
 
-span.onclick = function() {
-    modalDelete.style.display = "none";
+if (span) {
+    span.addEventListener('click', function() {
+        modalDelete.style.display = "none";
+    });
 }
 
-
-btnCancel.onclick = function() {
-    modalDelete.style.display = "none";
+if (btnCancel) {
+    btnCancel.addEventListener('click', function() {
+        modalDelete.style.display = "none";
+    });
 }
 
-
-btnConfirm.onclick = function() {
-    window.location.href = deleteUrl;
+if (btnConfirm) {
+    btnConfirm.addEventListener('click', function() {
+        window.location.href = deleteUrl;
+    });
 }
