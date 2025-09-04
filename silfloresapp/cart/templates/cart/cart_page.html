@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    Cart
+    Carrinho
 {% endblock %}
 
 {% block content %}
@@ -70,7 +70,7 @@
             <button id="generateTicket" data-user={{cartUser.username}} data-name="{{cartUser.name}}">Gerar etiqueta novamente</button>
             <script src="{% static 'src/js/generate_ticket.js' %}"></script>
         {% elif cart.status == 'sent' %}
-            <button id="trackShipment" data-user={{cartUser.username}}>Verifique o rastreio do seu pedido aqui</button>
+            <button id="trackShipment" data-user={{cartUser.username}}>Verifique o rastreio do pedido aqui</button>
             <script src="{% static 'src/js/track_shipment.js'%}"></script>
         {% endif %}
     {% endif %}

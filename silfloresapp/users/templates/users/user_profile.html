@@ -7,17 +7,18 @@
 Seu perfil
 {% endblock %}
 
+
 {% block content %}
     {% if user.username == profile.username %}
         <h1>Seu perfil</h1>
         <p>Nome Cadastrado: {{profile.name}}</p>
-        {% else %}
+    {% else %}
         <h1>{{profile.name}}</h1>
     {% endif %}
     <p>Nome de Usuário: {{profile.username}}</p>
     <p>Email: {{profile.email}}</p>
     {% if user.username == profile.username %}
-        <a href="{% url "updateUser" %}">Update profile</a>
+        <a href="{% url "updateUser" %}">Atualizar perfil</a>
         <button id="btnDelete" class="form-submit">Excluir Conta</button>
 
         <div class="modalDelete modal">

@@ -14,7 +14,7 @@ Login
         {% if request.GET.next %}
         <input type="hidden" name="next" value="{{request.GET.next}}"/>
         {% endif %}
-        <button class="form-submit" id="submit-button">Submit</button>
+        <button class="form-submit" id="submit-button">Enviar</button>
         <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
     </form>
     <button onclick="redirect_register()" class="form-submit">Register</button>

@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-User Update
+Atualizar usuário
 {% endblock %}
 
 {% block content %}
@@ -11,6 +11,6 @@ User Update
     <form class="form" action="/user/update/" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="form-submit">Submit</button>
+        <button class="form-submit">Enviar</button>
     </form>
 {% endblock content %}
